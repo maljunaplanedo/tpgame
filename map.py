@@ -1,4 +1,8 @@
 class Map:
+    FREEZE_TURN = -1
+    PROTAGONIST_TURN = 0
+    ANTAGONIST_TURN = 1
+
     def __init__(self, game):
         self.game = game
         self.squads = []
