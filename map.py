@@ -113,6 +113,7 @@ class Squad:
 
     def unite(self, friend_squad):
         self.soldiers += friend_squad.soldiers
+        friend_squad.soldiers = []
 
     def interact(self, other):
         if self.player == other.player:
