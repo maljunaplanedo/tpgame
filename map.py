@@ -53,7 +53,7 @@ class Map:
         pass
 
 
-class Solider:
+class Soldier:
     def __init__(self, squad, armor, attack):
         self.squad = squad
         self.armor = armor
