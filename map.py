@@ -7,6 +7,7 @@ class Player:
 
 
 class Fortress:
+
     def __init__(self, game, x, y):
         self.game = game
         self.garisson = None
@@ -26,14 +27,20 @@ class Fortress:
     def generate_shop(self):
         pass
 
+    def accept_visitor(self, squad):
+        if self.master == self.game.map.antagonist and self.garisson:
+            squad.fight(self.garisson)
+            if not squad.soldiers:
+                return
+
+        self.guest = squad
+        self.open_base_menu()
+
 
 class Map:
-    FREEZE_TURN = -1
-    PROTAGONIST_TURN = 0
-    ANTAGONIST_TURN = 1
-
     WIDTH = 128
     HEIGHT = 128
+    FORTRESSES_NUMBER = 12
 
     def __init__(self, game):
         self.game = game
@@ -41,16 +48,22 @@ class Map:
         self.fortresses = []
         self.protagonist = Player()
         self.antagonist = Player()
-        self.turn = -1
+        self.turn = None
         self.selected_squad = None
 
         if game.network.is_host():
             self.generate_map()
             self.send_state()
-        else:
-            self.get_state()
+
+    def get_fort_by_garisson(self, squad):
+        return [i for i in self.fortresses if i.garisson is squad][0]
 
     def move_selected_squad(self, dx, dy):
+        if self.selected_squad.is_garisson():
+            fort = self.get_fort_by_garisson(self.selected_squad)
+            fort.open_base_menu()
+            return
+
         self.selected_squad.move(dx, dy)
         x = self.selected_squad.x
         y = self.selected_squad.y
@@ -84,9 +97,6 @@ class Map:
     def send_state(self):
         pass
 
-    def get_state(self):
-        pass
-
     def squads_at_cell(self, x, y):
         return [squad for squad in self.squads
                 if squad.x == x and squad.y == y]
@@ -95,9 +105,27 @@ class Map:
         return [fort for fort in self.fortresses
                 if fort.x == x and fort.y == y]
 
+    def is_empty_cell(self, x, y):
+        return (x in range(self.WIDTH) and y in range(self.HEIGHT) and
+            not self.squads_at_cell(x, y) and not self.forts_at_cell(x, y))
+
     def generate_map(self):
         self.add_squad(self.protagonist, 0, 0)
+        self.squads[-1].add_soldier(Soldier(self.squads[-1]))
+
         self.add_squad(self.antagonist, self.WIDTH - 1, self.HEIGHT - 1)
+        self.squads[-1].add_soldier(Soldier(self.squads[-1]))
+
+        for i in range(self.FORTRESSES_NUMBER):
+            fort_x, fort_y = -1, -1
+            while True:
+                fort_x = random.randrange(self.WIDTH)
+                fort_y = random.randrange(self.HEIGHT)
+                if (self.is_empty_cell(fort_x, fort_y) and
+                        self.is_empty_cell(fort_x, fort_y - 1)):
+                    break
+
+            self.fortresses.append(Fortress(self.game, fort_x, fort_y))
 
 
 class Soldier:
@@ -118,7 +146,7 @@ class Soldier:
 
 
 class Squad:
-    def __init__(self, player=0, x=0, y=0):
+    def __init__(self, player, x=-1, y=-1):
         self.player = player
         self.x = x
         self.y = y
@@ -127,13 +155,6 @@ class Squad:
     def move(self, dx, dy):
         self.x += dx
         self.y += dy
-
-    def invade_fortress(self, fortress):
-        if fortress.garisson:
-            self.fight(fortress.garisson)
-
-    def __del__(self):
-        self.soldiers.clear()
 
     def add_soldier(self, soldier: Soldier):
         self.soldiers.append(soldier)
@@ -146,6 +167,9 @@ class Squad:
 
     def size(self):
         return len(self.soldiers)
+
+    def is_garisson(self) -> bool:
+        return self.x == -1
 
     def fight(self, enemy):
         while (not self.empty()) and (not enemy.empty()):
