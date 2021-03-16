@@ -61,7 +61,9 @@ class Map:
         if fort_at_cell:
             fort_at_cell[0].accept_visitor(self.selected_squad)
         elif len(squads_at_cell) == 2:
-            squads_at_cell[0].interact(squads_at_cell[1])
+            other_squad = (squads_at_cell[0] if squads_at_cell[1]
+                           is self.selected_squad else squads_at_cell[0])
+            self.selected_squad.interact(other_squad)
 
         self.clear_squads()
 
@@ -69,6 +71,8 @@ class Map:
         self.squads.append(Squad(player, x, y))
 
     def clear_squads(self):
+        while self.selected_squad.empty():
+            self.select_other_squad()
         self.squads = [squad for squad in self.squads if not squad.empty()]
 
     def select_other_squad(self):
