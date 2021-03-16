@@ -10,7 +10,7 @@ class Fortress:
 
     def __init__(self, game, x, y):
         self.game = game
-        self.garisson = None
+        self.garrison = None
         self.guest = None
         self.shop = []
         self.master = None
@@ -28,8 +28,8 @@ class Fortress:
         pass
 
     def accept_visitor(self, squad):
-        if self.master == self.game.map.antagonist and self.garisson:
-            squad.fight(self.garisson)
+        if self.master == self.game.map.antagonist and self.garrison:
+            squad.fight(self.garrison)
             if not squad.soldiers:
                 return
 
@@ -55,12 +55,12 @@ class Map:
             self.generate_map()
             self.send_state()
 
-    def get_fort_by_garisson(self, squad):
-        return [i for i in self.fortresses if i.garisson is squad][0]
+    def get_fort_by_garrison(self, squad):
+        return [i for i in self.fortresses if i.garrison is squad][0]
 
     def move_selected_squad(self, dx, dy):
-        if self.selected_squad.is_garisson():
-            fort = self.get_fort_by_garisson(self.selected_squad)
+        if self.selected_squad.is_garrison():
+            fort = self.get_fort_by_garrison(self.selected_squad)
             fort.open_base_menu()
             return
 
@@ -168,7 +168,7 @@ class Squad:
     def size(self):
         return len(self.soldiers)
 
-    def is_garisson(self) -> bool:
+    def is_garrison(self) -> bool:
         return self.x == -1
 
     def fight(self, enemy):
