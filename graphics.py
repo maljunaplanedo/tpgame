@@ -24,8 +24,9 @@ class GtkCairoFacade(GraphicsFacade):
         super().__init__(window)
         self.gtk_window = Gtk.Window()
         self.gtk_window.connect('destroy', self.close)
-        self.gtk_window.default_size(self.window.WIDTH, self.window.HEIGHT)
+        self.gtk_window.set_default_size(self.window.WIDTH, self.window.HEIGHT)
         self.gtk_window.set_resizable(False)
+        self.gtk_window.connect('key-press-event', self.keyboard_event)
         self.gtk_draw_area = Gtk.DrawingArea()
         self.gtk_draw_area.connect('draw', self.draw)
         self.gtk_draw_area.show()
@@ -37,6 +38,10 @@ class GtkCairoFacade(GraphicsFacade):
         while Gtk.events_pending():
             Gtk.main_iteration()
 
+    def keyboard_event(self, widget, event):
+        key = Gdk.keyval_name(event.keyval)
+        self.window.keyboard_event(key)
+
     def close(self, event):
         self.window.close()
 
@@ -47,11 +52,6 @@ class GtkCairoFacade(GraphicsFacade):
     def redraw(self):
         rect = self.gtk_draw_area.get_allocation()
         self.gtk_draw_area.get_window().invalidate_rect(rect, True)
-
-    def draw_circle(self):
-        self.cr.set_source_rgb(.5, .5, .5)
-        self.cr.arc(50, 50, 50, 0, 2 * math.pi)
-        self.cr.fill()
 
 
 class Screen:
@@ -91,7 +91,7 @@ class Window:
         self.game.stop()
 
     def draw(self):
-        self.graphics_facade.draw_circle()
+        pass
 
     def keyboard_event(self, key):
         if self.screen is not None:
