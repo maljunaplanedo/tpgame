@@ -44,6 +44,8 @@ class Fortress:
             if squad.empty():
                 return
 
+        self.change_master(squad.player)
+
         if self.garrison is None:
             self.garrison = Squad(self.game.map.protagonist, -1, -1)
 
