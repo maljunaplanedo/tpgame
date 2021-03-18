@@ -10,15 +10,15 @@ class Fortress:
 
     def __init__(self, game, x, y):
         self.game = game
-        self.garrison = None
         self.guest = None
+        self.garrison = None
         self.shop = []
         self.master = None
         self.x = x
         self.y = y
         self.generate_shop()
 
-    def open_base_menu(self):
+    def open_fortress_menu(self):
         pass
 
     def change_master(self, master):
@@ -27,20 +27,41 @@ class Fortress:
     def generate_shop(self):
         pass
 
+    def close_fortress_menu(self):
+        pass
+
+    def check_garrison_existence(self):
+        if self.garrison.empty():
+            self.garrison = None
+
     def accept_visitor(self, squad):
-        if self.master == self.game.map.antagonist and self.garrison:
+        if (self.master == self.game.map.antagonist
+                and self.garrison is not None):
+
             squad.fight(self.garrison)
-            if not squad.soldiers:
+            self.check_garrison_existence()
+            if squad.empty():
                 return
 
+        if self.garrison is None:
+            self.garrison = Squad(self.game.map.protagonist, -1, -1)
+
         self.guest = squad
-        self.open_base_menu()
+        self.open_fortress_menu()
+
+    def throw_guest_away(self):
+        self.check_garrison_existence()
+        if not self.guest.empty():
+            self.game.map.move_selected_squad(0, -1)
+        self.guest = None
+        self.close_fortress_menu()
 
 
 class Map:
     WIDTH = 128
     HEIGHT = 128
     FORTRESSES_NUMBER = 12
+    ONE_TURN_MOVES = 10
 
     def __init__(self, game):
         self.game = game
@@ -50,8 +71,10 @@ class Map:
         self.antagonist = Player()
         self.turn = None
         self.selected_squad = None
+        self.moves_left = 0
 
-        if game.network.is_host():
+    def on_network_connected(self, event):
+        if self.game.network.is_host():
             self.generate_map()
             self.send_state()
 
@@ -61,7 +84,7 @@ class Map:
     def move_selected_squad(self, dx, dy):
         if self.selected_squad.is_garrison():
             fort = self.get_fort_by_garrison(self.selected_squad)
-            fort.open_base_menu()
+            fort.open_fortress_menu()
             return
 
         self.selected_squad.move(dx, dy)
@@ -79,6 +102,19 @@ class Map:
             self.selected_squad.interact(other_squad)
 
         self.clear_squads()
+
+        self.moves_left -= 1
+        self.check_win()
+        self.check_turn_end()
+
+    def check_win(self):
+        pass
+
+    def check_turn_end(self):
+        if not self.moves_left:
+            self.start_turn(self.protagonist
+                            if self.turn == self.antagonist
+                            else self.antagonist)
 
     def add_squad(self, player, x, y):
         self.squads.append(Squad(player, x, y))
@@ -107,7 +143,12 @@ class Map:
 
     def is_empty_cell(self, x, y):
         return (x in range(self.WIDTH) and y in range(self.HEIGHT) and
-            not self.squads_at_cell(x, y) and not self.forts_at_cell(x, y))
+                not self.squads_at_cell(x, y) and
+                not self.forts_at_cell(x, y))
+
+    def start_turn(self, player):
+        self.moves_left = self.ONE_TURN_MOVES
+        self.turn = player
 
     def generate_map(self):
         self.add_squad(self.protagonist, 0, 0)
@@ -126,6 +167,9 @@ class Map:
                     break
 
             self.fortresses.append(Fortress(self.game, fort_x, fort_y))
+
+        self.start_turn(self.protagonist if random.randrange(1)
+                        else self.antagonist)
 
 
 class Soldier:
