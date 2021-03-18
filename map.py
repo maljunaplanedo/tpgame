@@ -1,5 +1,6 @@
 import random
 from network import INetworkEventSubscriber
+import copy
 
 
 class Player:
@@ -8,6 +9,7 @@ class Player:
 
 
 class Fortress:
+    SHOP_SIZE = 6
 
     def __init__(self, game, x, y):
         self.game = game
@@ -26,7 +28,25 @@ class Fortress:
         self.master = master
 
     def generate_shop(self):
-        pass
+        for i in range(self.SHOP_SIZE):
+            soldier = Soldier(None,
+                              random.randint(Soldier.MIN_ARMOR, Soldier.MAX_ARMOR),
+                              random.randint(Soldier.MIN_ATTACK, Soldier.MAX_ATTACK)
+                              )
+            self.shop.append((soldier, soldier.cost()))
+
+    def recruit_soldier(self, index):
+        soldier_cost = self.shop[index]
+        if soldier_cost[1] > self.guest.player.gold:
+            return False
+        self.guest.player.gold -= soldier_cost[1]
+        self.guest.append(copy.copy(soldier_cost[0]))
+        return True
+
+    def move_soldier(self, index, to_guest):
+        from_, to_ = (self.garrison, self.guest) if to_guest else (self.guest, self.garrison)
+        to_.append(from_[index])
+        from_.pop(index)
 
     def close_fortress_menu(self):
         pass
@@ -55,6 +75,7 @@ class Fortress:
     def throw_guest_away(self):
         self.check_garrison_existence()
         if not self.guest.empty():
+            self.game.map.selected_squad = self.guest
             self.game.map.move_selected_squad(0, -1)
         self.guest = None
         self.close_fortress_menu()
@@ -94,6 +115,7 @@ class Map(INetworkEventSubscriber):
     def move_selected_squad(self, dx, dy):
         if self.selected_squad.is_garrison():
             fort = self.get_fort_by_garrison(self.selected_squad)
+            fort.guest = Squad(self.protagonist, fort.x, fort.y)
             fort.open_fortress_menu()
             return
 
@@ -134,10 +156,10 @@ class Map(INetworkEventSubscriber):
             self.select_other_squad()
         self.squads = [squad for squad in self.squads if not squad.empty()]
 
-    def select_other_squad(self):
-        index = self.squads.index(self.selected_squad)
+    def select_other_squad(self, delta=1):
+        index = (self.squads.index(self.selected_squad) + delta) % len(self.squads)
         while self.squads[index].owner != self.protagonist:
-            index = (index + 1) % len(self.squads)
+            index = (index + delta) % len(self.squads)
         self.selected_squad = self.squads[index]
 
     def send_state(self):
@@ -183,13 +205,22 @@ class Map(INetworkEventSubscriber):
 
 
 class Soldier:
-    def __init__(self, squad, armor=0, attack=30):
+    DEFAULT_COST = 30
+    DEFAULT_ARMOR = 0
+    DEFAULT_ATTACK = 30
+    BONUS_COST = 100
+    MIN_ATTACK = 30
+    MAX_ATTACK = 230
+    MIN_ARMOR = 0
+    MAX_ARMOR = 80
+
+    def __init__(self, squad = None, armor=DEFAULT_ARMOR, attack=DEFAULT_ATTACK):
         self.squad = squad
         self.armor = armor
         self.attack = attack
         self.hp = 100
 
-    def alive(self):
+    def alive(self) -> bool:
         return self.hp > 0
 
     def fight(self, enemy):
@@ -197,6 +228,16 @@ class Soldier:
         enemy_attack = enemy.attack * (100 - self.armor) // 100
         self.hp -= enemy_attack
         enemy.hp -= my_attack
+
+    def cost(self) -> int:
+        delta_armor = self.armor - self.MIN_ARMOR
+        delta_attack = self.attack - self.MIN_ATTACK
+        delta_armor_percent = delta_armor / (self.MAX_ARMOR - self.MIN_ARMOR)
+        delta_attack_percent = delta_attack / (self.MAX_ATTACK - self.MIN_ATTACK)
+        return (
+            self.DEFAULT_COST +
+            int(self.BONUS_COST * (delta_armor_percent + delta_attack_percent))
+        )
 
 
 class Squad:
@@ -213,28 +254,30 @@ class Squad:
     def add_soldier(self, soldier: Soldier):
         self.soldiers.append(soldier)
 
-    def empty(self):
+    def empty(self) -> bool:
         return len(self.soldiers) == 0
 
     def update(self):
         self.soldiers = [soldier for soldier in self.soldiers if soldier.alive()]
 
-    def size(self):
+    def size(self) -> int:
         return len(self.soldiers)
 
     def is_garrison(self) -> bool:
         return self.x == -1
 
-    def fight(self, enemy):
+    def fight(self, enemy) -> bool:
         while (not self.empty()) and (not enemy.empty()):
             for i in range(min(self.size(), enemy.size())):
                 self.soldiers[i].fight(enemy.soldiers[i])
             self.update()
             enemy.update()
         if self.empty():
-            return 'Defeat'
+            #Defeat
+            return False
         else:
-            return 'Victory'
+            #Victory
+            return True
 
     def unite(self, friend_squad):
         self.soldiers += friend_squad.soldiers

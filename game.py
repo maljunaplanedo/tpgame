@@ -5,8 +5,8 @@ from graphics import Window
 
 class Game:
     def __init__(self):
-        self.map = Map(self)
         self.network = Network()
+        self.map = Map(self)
         self.window = Window(self)
         self.main_loop_running = False
 
