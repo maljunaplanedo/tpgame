@@ -56,14 +56,18 @@ class GtkCairoFacade(GraphicsFacade):
 
 class Screen:
 
-    def __init__(self, game):
-        self.game = game
+    def __init__(self, window):
+        self.window = window
 
     def open_(self):
-        self.game.window.change_screen(self)
+        self.window.change_screen(self)
 
     @abstractmethod
-    def keyboard_event(self):
+    def keyboard_event(self, key):
+        pass
+
+    @abstractmethod
+    def draw(self):
         pass
 
 
@@ -91,9 +95,10 @@ class Window:
         self.game.stop()
 
     def draw(self):
+        self.screen.draw()
         pass
 
     def keyboard_event(self, key):
-        if self.screen is not None:
-            self.screen.keyboard_event(key)
+        print(key)
+        self.screen.keyboard_event(key)
         self.redraw()
