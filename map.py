@@ -1,4 +1,5 @@
 import random
+from network import INetworkEventSubscriber
 
 
 class Player:
@@ -57,7 +58,7 @@ class Fortress:
         self.close_fortress_menu()
 
 
-class Map:
+class Map(INetworkEventSubscriber):
     WIDTH = 128
     HEIGHT = 128
     FORTRESSES_NUMBER = 12
@@ -72,6 +73,13 @@ class Map:
         self.turn = None
         self.selected_squad = None
         self.moves_left = 0
+
+        self.game.network.subscribe('connect', self)
+        self.game.network.subscribe('map_update', self)
+
+    def handle_network_event(self, type_, event):
+        self.game.window.redraw()
+        pass
 
     def on_network_connected(self, event):
         if self.game.network.is_host():
