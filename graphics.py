@@ -6,6 +6,7 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, Gdk, GObject
 
 
+# Facade pattern
 class GraphicsFacade:
     def __init__(self, window):
         self.window = window
@@ -99,6 +100,5 @@ class Window:
         pass
 
     def keyboard_event(self, key):
-        print(key)
         self.screen.keyboard_event(key)
         self.redraw()
