@@ -2,6 +2,7 @@ import random
 from network import INetworkEventSubscriber
 import copy
 from abc import abstractmethod
+from screens import EndScreen, MapScreen, FortressScreen
 
 
 # Composite pattern
@@ -68,7 +69,7 @@ class Fortress(IMapObjInfoConvertible):
             self.shop[-1][0].reset_from_info(i[0])
 
     def open_fortress_menu(self):
-        pass
+        FortressScreen(self.game.window, self).open_()
 
     def change_master(self, master):
         self.master = master
@@ -95,7 +96,7 @@ class Fortress(IMapObjInfoConvertible):
         from_.pop(index)
 
     def close_fortress_menu(self):
-        pass
+        MapScreen(self.game.window, self.game.map).open_()
 
     def check_garrison_existence(self):
         if self.garrison.empty():
@@ -218,7 +219,8 @@ class Map(INetworkEventSubscriber, IMapObjInfoConvertible):
             self.on_network_connected(event['host'])
         elif type_ == 'map_update':
             self.reset_from_info(event)
-            self.check_game_end()
+            if not self.check_game_end():
+                self.check_turn_end()
         self.game.window.redraw()
 
     def on_network_connected(self, is_host):
@@ -253,13 +255,40 @@ class Map(INetworkEventSubscriber, IMapObjInfoConvertible):
         self.clear_squads()
 
         self.moves_left -= 1
-        self.check_game_end()
-        self.check_turn_end()
-
         self.send_state()
 
+        if not self.check_game_end():
+            self.check_turn_end()
+
+    def end_game(self, result):
+        EndScreen(self.game.window, result).open_()
+
     def check_game_end(self):
-        pass
+        protagonist_forts =\
+            [i for i in self.fortresses if i.master == self.protagonist]
+        antagonist_forts =\
+            [i for i in self.fortresses if i.master == self.antagonist]
+        protagonist_squads =\
+            [i for i in self.squads if i.player == self.protagonist]
+        antagonist_squads =\
+            [i for i in self.squads if i.player == self.antagonist]
+
+        if len(protagonist_squads) == 0 and len(antagonist_squads) == 0:
+            self.end_game(-1)
+            return True
+        elif len(protagonist_squads) == 0:
+            self.end_game(1)
+            return True
+        elif len(antagonist_squads) == 0:
+            self.end_game(0)
+            return True
+        elif len(protagonist_forts) == self.FORTRESSES_NUMBER:
+            self.end_game(0)
+            return True
+        elif len(antagonist_forts) == self.FORTRESSES_NUMBER:
+            self.end_game(1)
+            return True
+        return False
 
     def check_turn_end(self):
         if not self.moves_left:
@@ -288,7 +317,8 @@ class Map(INetworkEventSubscriber, IMapObjInfoConvertible):
         self.selected_squad = self.squads[index]
 
     def send_state(self):
-        pass
+        state = self.get_info()
+        self.game.network.send_message({'type': 'map_update', 'event': state})
 
     def squads_at_cell(self, x, y):
         return [squad for squad in self.squads

@@ -78,9 +78,11 @@ class Network:
                     self.is_host = True
 
             self.connect()
+            return True
 
         except FileNotFoundError:
             self.open_network_info_screen()
+            return False
         except ValueError:
             exit(0)
 
