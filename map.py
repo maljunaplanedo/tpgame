@@ -1,15 +1,36 @@
 import random
 from network import INetworkEventSubscriber
 import copy
+from abc import abstractmethod
 
 
-class Player:
-    def __init__(self):
+# Composite pattern
+class IMapObjInfoConvertible:
+    @abstractmethod
+    def get_info(self):
+        pass
+
+    @abstractmethod
+    def reset_from_info(self, info):
+        pass
+
+
+class Player(IMapObjInfoConvertible):
+    def __init__(self, map_):
         self.gold = 0
+        self.map = map_
+
+    def get_info(self):
+        info = {'gold': self.gold}
+        return info
+
+    def reset_from_info(self, info):
+        self.gold = info['gold']
 
 
-class Fortress:
+class Fortress(IMapObjInfoConvertible):
     SHOP_SIZE = 6
+    FORTRESS_PROFIT = 100
 
     def __init__(self, game, x, y):
         self.game = game
@@ -20,6 +41,31 @@ class Fortress:
         self.x = x
         self.y = y
         self.generate_shop()
+
+    def get_info(self):
+        master = self.game.map.get_player_code(self.master)
+
+        info = {'guest': self.game.map.get_index_of_squad(self.guest),
+                'garrison': self.game.map.get_index_of_squad(self.garrison),
+                'shop': [],
+                'master': master,
+                'x': self.x,
+                'y': self.y}
+
+        for i in self.shop:
+            info['shop'].append([i[0].get_info(), i[1]])
+
+        return info
+
+    def reset_from_info(self, info):
+        self.guest = self.game.map.get_squad_by_index(info['guest'])
+        self.garrison = self.game.map.get_squad_by_index(info['garrison'])
+        self.master = self.game.map.get_player_by_code(info['master'])
+        self.shop = []
+
+        for i in info['shop']:
+            self.shop.append((Soldier(), i[1]))
+            self.shop[-1][0].reset_from_info(i[0])
 
     def open_fortress_menu(self):
         pass
@@ -81,7 +127,7 @@ class Fortress:
         self.close_fortress_menu()
 
 
-class Map(INetworkEventSubscriber):
+class Map(INetworkEventSubscriber, IMapObjInfoConvertible):
     WIDTH = 128
     HEIGHT = 128
     FORTRESSES_NUMBER = 12
@@ -91,8 +137,8 @@ class Map(INetworkEventSubscriber):
         self.game = game
         self.squads = []
         self.fortresses = []
-        self.protagonist = Player()
-        self.antagonist = Player()
+        self.protagonist = Player(self)
+        self.antagonist = Player(self)
         self.turn = None
         self.selected_squad = None
         self.moves_left = 0
@@ -100,12 +146,83 @@ class Map(INetworkEventSubscriber):
         self.game.network.subscribe('connect', self)
         self.game.network.subscribe('map_update', self)
 
-    def handle_network_event(self, type_, event):
-        self.game.window.redraw()
-        pass
+    def get_info(self):
+        turn = self.get_player_code(self.turn)
 
-    def on_network_connected(self, event):
-        if self.game.network.is_host():
+        selected_squad = self.get_index_of_squad(self.selected_squad)
+
+        info = {'squads': [],
+                'fortresses': [],
+                'selected_squad': selected_squad,
+                'moves_left': self.moves_left,
+                'turn': turn,
+                'protagonist': self.protagonist.get_info(),
+                'antagonist': self.antagonist.get_info()}
+
+        for i in self.squads:
+            info['squads'].append(i.get_info())
+
+        for i in self.fortresses:
+            info['fortresses'].append(i.get_info())
+
+        return info
+
+    def reset_from_info(self, info):
+        self.protagonist = Player(self)
+        self.antagonist = Player(self)
+
+        self.protagonist.reset_from_info(info['protagonist'])
+        self.antagonist.reset_from_info(info['antagonist'])
+
+        self.squads = []
+        self.fortresses = []
+
+        for i in info['squads']:
+            player = self.get_player_by_code(i['player'])
+            self.squads.append(Squad(player))
+            self.squads[-1].reset_from_info(i)
+
+        for i in info['fortresses']:
+            self.fortresses.append(Fortress(self.game, i['x'], i['y']))
+            self.fortresses[-1].reset_from_info(i)
+
+        self.moves_left = info['moves_left']
+        self.turn = self.get_player_by_code(info['turn'])
+        self.selected_squad = self.get_squad_by_index(info['selected_squad'])
+
+    def get_index_of_squad(self, squad):
+        try:
+            return self.squads.index(squad)
+        except ValueError:
+            return -1
+
+    def get_squad_by_index(self, index):
+        if index == -1:
+            return None
+        return self.squads[index]
+
+    def get_player_code(self, player):
+        if player == self.antagonist:
+            return 0
+        elif player == self.protagonist:
+            return 1
+        return -1
+
+    def get_player_by_code(self, code):
+        if code == -1:
+            return None
+        return self.protagonist if code == 0 else self.antagonist
+
+    def handle_network_event(self, type_, event):
+        if type_ == 'connect':
+            self.on_network_connected(event['host'])
+        elif type_ == 'map_update':
+            self.reset_from_info(event)
+            self.check_game_end()
+        self.game.window.redraw()
+
+    def on_network_connected(self, is_host):
+        if is_host:
             self.generate_map()
             self.send_state()
 
@@ -130,16 +247,18 @@ class Map(INetworkEventSubscriber):
             fort_at_cell[0].accept_visitor(self.selected_squad)
         elif len(squads_at_cell) == 2:
             other_squad = (squads_at_cell[0] if squads_at_cell[1]
-                           is self.selected_squad else squads_at_cell[0])
+                                                is self.selected_squad else squads_at_cell[0])
             self.selected_squad.interact(other_squad)
 
         self.clear_squads()
 
         self.moves_left -= 1
-        self.check_win()
+        self.check_game_end()
         self.check_turn_end()
 
-    def check_win(self):
+        self.send_state()
+
+    def check_game_end(self):
         pass
 
     def check_turn_end(self):
@@ -156,9 +275,15 @@ class Map(INetworkEventSubscriber):
             self.select_other_squad()
         self.squads = [squad for squad in self.squads if not squad.empty()]
 
+    def select_first_squad(self, player):
+        index = 0
+        while self.squads[index].player != player:
+            index += 1
+        self.selected_squad = self.squads[index]
+
     def select_other_squad(self, delta=1):
         index = (self.squads.index(self.selected_squad) + delta) % len(self.squads)
-        while self.squads[index].owner != self.protagonist:
+        while self.squads[index].player != self.protagonist:
             index = (index + delta) % len(self.squads)
         self.selected_squad = self.squads[index]
 
@@ -182,6 +307,12 @@ class Map(INetworkEventSubscriber):
         self.moves_left = self.ONE_TURN_MOVES
         self.turn = player
 
+        for i in self.fortresses:
+            if i.master == player:
+                player.gold += Fortress.FORTRESS_PROFIT
+
+        self.select_first_squad(player)
+
     def generate_map(self):
         self.add_squad(self.protagonist, 0, 0)
         self.squads[-1].add_soldier(Soldier(self.squads[-1]))
@@ -204,7 +335,7 @@ class Map(INetworkEventSubscriber):
                         else self.antagonist)
 
 
-class Soldier:
+class Soldier(IMapObjInfoConvertible):
     DEFAULT_COST = 30
     DEFAULT_ARMOR = 0
     DEFAULT_ATTACK = 30
@@ -214,11 +345,23 @@ class Soldier:
     MIN_ARMOR = 0
     MAX_ARMOR = 80
 
-    def __init__(self, squad = None, armor=DEFAULT_ARMOR, attack=DEFAULT_ATTACK):
+    def __init__(self, squad=None, armor=DEFAULT_ARMOR, attack=DEFAULT_ATTACK):
         self.squad = squad
         self.armor = armor
         self.attack = attack
         self.hp = 100
+
+    def get_info(self):
+        info = {'armor': self.armor,
+                'attack': self.attack,
+                'hp': self.hp
+                }
+        return info
+
+    def reset_from_info(self, info):
+        self.armor = info['armor']
+        self.attack = info['attack']
+        self.hp = info['hp']
 
     def alive(self) -> bool:
         return self.hp > 0
@@ -235,17 +378,38 @@ class Soldier:
         delta_armor_percent = delta_armor / (self.MAX_ARMOR - self.MIN_ARMOR)
         delta_attack_percent = delta_attack / (self.MAX_ATTACK - self.MIN_ATTACK)
         return (
-            self.DEFAULT_COST +
-            int(self.BONUS_COST * (delta_armor_percent + delta_attack_percent))
+                self.DEFAULT_COST +
+                int(self.BONUS_COST * (delta_armor_percent + delta_attack_percent))
         )
 
 
-class Squad:
+class Squad(IMapObjInfoConvertible):
     def __init__(self, player, x=-1, y=-1):
         self.player = player
         self.x = x
         self.y = y
         self.soldiers = []
+
+    def get_info(self):
+        player = self.player.map.get_player_code(self.player)
+        info = {'player': player,
+                'x': self.x,
+                'y': self.y,
+                'soldiers': []}
+
+        for i in self.soldiers:
+            info['soldiers'].append(i.get_info())
+
+        return info
+
+    def reset_from_info(self, info):
+        self.x = info['x']
+        self.y = info['y']
+        self.soldiers = []
+
+        for i in info['soldiers']:
+            self.soldiers.append(Soldier(self))
+            self.soldiers[-1].reset_from_info(i)
 
     def move(self, dx, dy):
         self.x += dx
@@ -273,10 +437,10 @@ class Squad:
             self.update()
             enemy.update()
         if self.empty():
-            #Defeat
+            # Defeat
             return False
         else:
-            #Victory
+            # Victory
             return True
 
     def unite(self, friend_squad):

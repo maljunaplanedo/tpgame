@@ -4,6 +4,7 @@ from collections import defaultdict, deque
 import json
 
 
+# Observer pattern
 class INetworkEventSubscriber:
     @abstractmethod
     def handle_network_event(self, type_, event):
