@@ -86,9 +86,9 @@ class MapScreen(Screen):
 
 
 class EndScreen(Screen):
-    def __init__(self, window: Window):
+    def __init__(self, window: Window, result: int):
         super().__init__(window)
-        self.draw()
+        self.result = result
 
     def keyboard_event(self, key):
         pass

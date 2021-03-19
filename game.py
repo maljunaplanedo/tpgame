@@ -1,6 +1,7 @@
 from map import Map
 from network import Network
 from graphics import Window
+from screens import MapScreen
 
 
 class Game:
@@ -11,7 +12,8 @@ class Game:
         self.main_loop_running = False
 
     def run(self):
-        self.network.check_file_data()
+        if self.network.check_file_data():
+            MapScreen(self.window, self.map).open_()
         self.main_loop_running = True
         while self.main_loop_running:
             self.window.iteration()
