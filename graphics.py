@@ -76,6 +76,7 @@ class GtkCairoFacade(GraphicsFacade):
             self.cr.set_source_rgb(0, 0, 0)
         else:
             self.cr.set_source_rgb(1, 1, 1)
+        self.cr.rectangle(0, 0, self.window.width, self.window.height)
         self.cr.fill()
 
     def draw_ground(self, x1, y1, x2, y2):
@@ -126,7 +127,7 @@ class GtkCairoFacade(GraphicsFacade):
             self.cr.set_source_rgb(1, 1, 1)
         else:
             self.cr.set_source_rgb(0, 0, 0)
-        self.cr.rectangle(col * self.LINE_WIDTH, (row + 1) * self.LINE_HEIGHT,
+        self.cr.rectangle(col * self.LINE_WIDTH, row * self.LINE_HEIGHT,
                           self.LINE_WIDTH, self.LINE_HEIGHT)
         self.cr.fill()
 
@@ -141,7 +142,7 @@ class GtkCairoFacade(GraphicsFacade):
             self.cr.set_source_rgb(1, 1, 0)
 
         self.cr.move_to(col * self.LINE_WIDTH + pos * self.LINE_WIDTH / 4,
-                        (row + 1) * self.LINE_HEIGHT)
+                        (row + 1.5) * self.LINE_HEIGHT)
 
         self.cr.show_text(text)
 
