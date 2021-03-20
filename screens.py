@@ -67,7 +67,7 @@ class MapScreen(Screen):
         elif key == 's':
             movement = (0, 1)
         else:
-            movement = (-1, 0)
+            movement = (1, 0)
         self.map.move_selected_squad(*movement)
 
     def change_squad_event(self, key):

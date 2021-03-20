@@ -242,6 +242,7 @@ class Map(INetworkEventSubscriber, IMapObjInfoConvertible):
         y = self.selected_squad.y
         x += dx
         y += dy
+        print(x, y)
         if not self.is_valid_cell(x, y):
             return
         self.selected_squad.move(dx, dy)
