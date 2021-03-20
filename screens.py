@@ -39,6 +39,9 @@ class FortressScreen(Screen):
                 self.selected_soldier[0] == self.fortress.guest
             )
 
+    def exit_event(self):
+        self.fortress.close_fortress_menu()
+
     def keyboard_event(self, key):
         if key in ['w', 's']:
             self.up_down_event(key)
@@ -46,6 +49,8 @@ class FortressScreen(Screen):
             self.right_left_event(key)
         elif key == 'e':
             self.equip_event()
+        elif key == 'Esc':
+            self.exit_event()
 
     def draw(self):
         self.window.graphics_facade.draw_background(True)

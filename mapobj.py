@@ -96,6 +96,7 @@ class Fortress(IMapObjInfoConvertible):
         from_.pop(index)
 
     def close_fortress_menu(self):
+        self.throw_guest_away()
         screens.MapScreen(self.game.window, self.game.map).open_()
 
     def check_garrison_existence(self):
