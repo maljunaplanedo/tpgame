@@ -93,6 +93,7 @@ class GtkCairoFacade(GraphicsFacade):
         self.cr.fill()
 
     def draw_fortress(self, owner, x, y):
+        print(owner)
         if owner == 1:
             self.cr.set_source_rgb(0, 0, 1)
         elif owner == 0:
@@ -102,7 +103,7 @@ class GtkCairoFacade(GraphicsFacade):
 
         self.cr.rectangle(x * self.CELL_SIZE, y * self.CELL_SIZE,
                           self.CELL_SIZE, self.CELL_SIZE)
-
+        self.cr.fill()
 
 class Screen:
 
