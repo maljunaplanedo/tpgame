@@ -49,7 +49,7 @@ class FortressScreen(Screen):
             self.right_left_event(key)
         elif key == 'e':
             self.equip_event()
-        elif key == 'Esc':
+        elif key == 'Escape':
             self.exit_event()
 
     def draw(self):
