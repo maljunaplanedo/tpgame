@@ -1,11 +1,10 @@
 from graphics import Screen
 from graphics import Window
-from map import Fortress
-from map import Map
+import mapobj
 
 
 class FortressScreen(Screen):
-    def __init__(self, window, fortress: Fortress):
+    def __init__(self, window, fortress):
         super().__init__(window)
         self.fortress = fortress
         self.selected_soldier = [self.fortress.guest, 0]
@@ -53,7 +52,11 @@ class FortressScreen(Screen):
 
 
 class MapScreen(Screen):
-    def __init__(self, window: Window, map_: Map):
+
+    WINDOW_CELL_WIDTH = 16
+    WINDOW_CELL_HEIGHT = 12
+
+    def __init__(self, window: Window, map_):
         super().__init__(window)
         self.map = map_
 
@@ -82,7 +85,33 @@ class MapScreen(Screen):
             self.change_squad_event(key)
 
     def draw(self):
-        pass
+        if self.map.selected_squad.is_garrison():
+            fort = self.map.get_fort_by_garrison(self.map.selected_squad)
+            camera_x = fort.x
+            camera_y = fort.y
+        else:
+            camera_x = self.map.selected_squad.x
+            camera_y = self.map.selected_squad.y
+
+        diff_x = camera_x - self.WINDOW_CELL_WIDTH // 2 + 1
+        diff_y = camera_y - self.WINDOW_CELL_HEIGHT // 2 + 1
+
+        self.window.graphics_facade.draw_ground(-diff_x, -diff_y,
+                                                self.map.WIDTH - diff_x,
+                                                self.map.HEIGHT - diff_y)
+
+        for i in self.map.fortresses:
+            player_code = self.map.get_player_code(i.master)
+            self.window.graphics_facade.draw_fortress(player_code,
+                                                      i.x - diff_x,
+                                                      i.y - diff_y)
+
+        for i in self.map.squads:
+            player_code = self.map.get_player_code(i.player)
+            if not i.is_garrison():
+                self.window.graphics_facade.draw_squad(player_code,
+                                                       i.x - diff_x,
+                                                       i.y - diff_y)
 
 
 class EndScreen(Screen):
