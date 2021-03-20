@@ -67,7 +67,7 @@ class FortressScreen(Screen):
             columns[-1][self.selected_soldier[1]]['selected'] = True
 
         for i in range(3):
-            for j in columns[i]:
+            for j in range(len(columns[i])):
                 line = columns[i][j]
                 self.window.graphics_facade.draw_line_background(i, j, 'selected' in line.keys())
                 if 'hp' in line.keys():
