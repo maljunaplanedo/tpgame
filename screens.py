@@ -85,7 +85,7 @@ class MapScreen(Screen):
 
     def draw(self):
         if self.map.turn is None:
-            pass
+            return
 
         if self.map.selected_squad.is_garrison():
             fort = self.map.get_fort_by_garrison(self.map.selected_squad)
