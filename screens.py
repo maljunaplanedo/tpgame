@@ -48,6 +48,8 @@ class FortressScreen(Screen):
             self.equip_event()
 
     def draw(self):
+        self.window.graphics_facade.draw_background(True)
+
         columns = [[]]
         for i in self.fortress.garrison.soldiers:
             columns[-1].append({'hp': i.hp, 'attack': i.attack, 'armor': i.armor})
