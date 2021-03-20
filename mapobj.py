@@ -183,8 +183,8 @@ class Map(INetworkEventSubscriber, IMapObjInfoConvertible):
         self.protagonist = Player(self)
         self.antagonist = Player(self)
 
-        self.protagonist.reset_from_info(info['protagonist'])
-        self.antagonist.reset_from_info(info['antagonist'])
+        self.protagonist.reset_from_info(info['antagonist'])
+        self.antagonist.reset_from_info(info['protagonist'])
 
         self.squads = []
         self.fortresses = []
