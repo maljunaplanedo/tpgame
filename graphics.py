@@ -37,6 +37,8 @@ class GtkCairoFacade(GraphicsFacade):
     CELL_SIZE = 40
     LINE_HEIGHT = 40
     LINE_WIDTH = 640 / 3
+    GOLD_PANEL_HEIGHT = 40
+    GOLD_PANEL_WIDTH = 300
 
     def __init__(self, window):
         super().__init__(window)
@@ -149,6 +151,17 @@ class GtkCairoFacade(GraphicsFacade):
     def draw_end_text(self, text):
         self.cr.move_to(self.window.width / 2, self.window.height / 2)
         self.cr.show_text(text)
+
+    def draw_gold_panel_background(self):
+        self.cr.set_source_rgb(0, 0, 0)
+        self.cr.rectangle(self.window.width - self.GOLD_PANEL_WIDTH, 0,
+                          self.GOLD_PANEL_WIDTH, self.GOLD_PANEL_HEIGHT)
+        self.cr.fill()
+
+    def draw_gold(self, gold):
+        self.cr.move_to(self.window.width - self.GOLD_PANEL_WIDTH, self.GOLD_PANEL_HEIGHT / 2)
+        self.cr.set_source_rgb(1, 1, 0)
+        self.cr.show_text(str(gold))
 
 
 class Screen:

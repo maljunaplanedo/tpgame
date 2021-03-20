@@ -140,10 +140,10 @@ class Fortress(IMapObjInfoConvertible):
 
 
 class Map(INetworkEventSubscriber, IMapObjInfoConvertible):
-    WIDTH = 10
-    HEIGHT = 10
-    FORTRESSES_NUMBER = 1
-    ONE_TURN_MOVES = 100
+    WIDTH = 64
+    HEIGHT = 64
+    FORTRESSES_NUMBER = 12
+    ONE_TURN_MOVES = 10
 
     def __init__(self, game):
         self.game = game
