@@ -78,6 +78,8 @@ class MapScreen(Screen):
         self.map.select_other_squad(delta)
 
     def keyboard_event(self, key):
+        if self.map.turn != self.map.protagonist:
+            return
         if key in ['w', 'a', 's', 'd']:
             self.movement_event(key)
         elif key in ['Left', 'Right']:
