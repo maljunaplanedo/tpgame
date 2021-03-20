@@ -368,7 +368,7 @@ class Map(INetworkEventSubscriber, IMapObjInfoConvertible):
 
             self.fortresses.append(Fortress(self.game, fort_x, fort_y))
 
-        self.start_turn(self.protagonist if random.randrange(1)
+        self.start_turn(self.protagonist if random.randrange(2)
                         else self.antagonist)
 
 
