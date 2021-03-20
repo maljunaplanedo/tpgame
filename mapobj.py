@@ -18,7 +18,7 @@ class IMapObjInfoConvertible:
 
 class Player(IMapObjInfoConvertible):
     def __init__(self, map_):
-        self.gold = 0
+        self.gold = 100000
         self.map = map_
 
     def get_info(self):
