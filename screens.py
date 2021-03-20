@@ -39,7 +39,7 @@ class FortressScreen(Screen):
                 self.selected_soldier[0] != self.fortress.guest
             )
         if self.selected_soldier[1] >= len(self.selected_soldier[0]):
-            if len(self.selected_soldier[0] == 0):
+            if len(self.selected_soldier[0]) == 0:
                 self.selected_soldier[0] = self.fortress.shop
                 self.selected_soldier[1] = 0
             else:
