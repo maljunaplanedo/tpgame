@@ -49,6 +49,7 @@ class FortressScreen(Screen):
         self.fortress.throw_guest_away()
 
     def keyboard_event(self, key):
+        print(self.window.game.map.get_info())
         if key in ['w', 's']:
             self.up_down_event(key)
         elif key in ['a', 'd']:

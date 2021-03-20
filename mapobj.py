@@ -108,6 +108,7 @@ class Fortress(IMapObjInfoConvertible):
 
             squad.fight(self.garrison)
             self.check_garrison_existence()
+            self.game.map.clear_squads()
             if squad.empty():
                 return
 
@@ -126,7 +127,7 @@ class Fortress(IMapObjInfoConvertible):
             self.game.map.selected_squad = self.garrison
         else:
             self.game.map.selected_squad = self.guest
-            self.game.map.move_selected_squad(0, -1)
+            self.guest.move(0, -1)
 
         self.guest = None
         self.game.map.clear_squads()
@@ -262,10 +263,9 @@ class Map(INetworkEventSubscriber, IMapObjInfoConvertible):
             fort_at_cell[0].accept_visitor(self.selected_squad)
         elif len(squads_at_cell) == 2:
             other_squad = (squads_at_cell[0] if squads_at_cell[1]
-                           is self.selected_squad else squads_at_cell[0])
+                           is self.selected_squad else squads_at_cell[1])
             self.selected_squad.interact(other_squad)
-
-        self.clear_squads()
+            self.clear_squads()
 
         self.moves_left -= 1
         self.send_state()
