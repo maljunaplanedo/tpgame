@@ -189,7 +189,6 @@ class Window:
 
     def draw(self):
         self.screen.draw()
-        pass
 
     def keyboard_event(self, key):
         self.screen.keyboard_event(key)

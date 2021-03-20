@@ -114,7 +114,8 @@ class Fortress(IMapObjInfoConvertible):
         self.change_master(squad.player)
 
         if self.garrison is None:
-            self.garrison = Squad(self.game.map.protagonist, -1, -1)
+            self.game.map.add_squad(self.game.map.protagonist, -1, -1)
+            self.garrison = self.game.map.squads[-1]
 
         self.guest = squad
         self.open_fortress_menu()
@@ -241,7 +242,8 @@ class Map(INetworkEventSubscriber, IMapObjInfoConvertible):
     def move_selected_squad(self, dx, dy):
         if self.selected_squad.is_garrison():
             fort = self.get_fort_by_garrison(self.selected_squad)
-            fort.guest = Squad(self.protagonist, fort.x, fort.y)
+            self.add_squad(self.protagonist, fort.x, fort.y)
+            fort.guest = self.squads[-1]
             fort.open_fortress_menu()
             return
 
