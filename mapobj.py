@@ -87,7 +87,7 @@ class Fortress(IMapObjInfoConvertible):
         if soldier_cost[1] > self.guest.player.gold:
             return False
         self.guest.player.gold -= soldier_cost[1]
-        self.guest.append(copy.copy(soldier_cost[0]))
+        self.guest.add_soldier(copy.copy(soldier_cost[0]))
         return True
 
     def move_soldier(self, index, to_guest):
