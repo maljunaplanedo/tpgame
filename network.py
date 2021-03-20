@@ -12,7 +12,7 @@ class INetworkEventSubscriber:
 
 
 class Network:
-    MESSAGE_LEN = 32768
+    MESSAGE_LEN = 16384
 
     def __init__(self):
         self.subscribers = defaultdict(list)
@@ -34,6 +34,7 @@ class Network:
     @staticmethod
     def encode_message(message):
         message = json.dumps(message).encode()
+        print(len(message))
         message += b'#' * (Network.MESSAGE_LEN - len(message))
 
         return message
