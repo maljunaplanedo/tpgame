@@ -285,9 +285,9 @@ class Map(INetworkEventSubscriber, IMapObjInfoConvertible):
         antagonist_forts =\
             [i for i in self.fortresses if i.master == self.antagonist]
         protagonist_squads =\
-            [i for i in self.squads if i.player == self.protagonist]
+            [i for i in self.squads if i.player == self.protagonist and not i.empty()]
         antagonist_squads =\
-            [i for i in self.squads if i.player == self.antagonist]
+            [i for i in self.squads if i.player == self.antagonist and not i.empty()]
 
         if len(protagonist_squads) == 0 and len(antagonist_squads) == 0:
             self.end_game(-1)

@@ -161,8 +161,9 @@ class MapScreen(Screen):
                                                        i.x - diff_x,
                                                        i.y - diff_y)
 
-        self.window.graphics_facade.draw_gold_panel_background()
+        self.window.graphics_facade.draw_panel_background()
         self.window.graphics_facade.draw_gold(self.map.protagonist.gold)
+        self.window.graphics_facade.draw_moves_left(self.map.moves_left)
 
 
 class EndScreen(Screen):

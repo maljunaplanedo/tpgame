@@ -152,7 +152,7 @@ class GtkCairoFacade(GraphicsFacade):
         self.cr.move_to(self.window.width / 2, self.window.height / 2)
         self.cr.show_text(text)
 
-    def draw_gold_panel_background(self):
+    def draw_panel_background(self):
         self.cr.set_source_rgb(0, 0, 0)
         self.cr.rectangle(self.window.width - self.GOLD_PANEL_WIDTH,
                           self.window.height - self.GOLD_PANEL_HEIGHT,
@@ -165,6 +165,13 @@ class GtkCairoFacade(GraphicsFacade):
         self.cr.set_source_rgb(1, 1, 0)
         self.cr.set_font_size(24)
         self.cr.show_text(str(gold))
+
+    def draw_moves_left(self, moves):
+        self.cr.move_to(self.window.width - self.GOLD_PANEL_WIDTH + 200,
+                        self.window.height - self.GOLD_PANEL_HEIGHT / 2)
+        self.cr.set_source_rgb(0, 0, 1)
+        self.cr.set_font_size(24)
+        self.cr.show_text(str(moves))
 
 
 class Screen:
