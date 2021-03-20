@@ -4,10 +4,12 @@ import mapobj
 
 
 class FortressScreen(Screen):
+    WINDOW_LINE_HEIGHT = 12
+
     def __init__(self, window, fortress):
         super().__init__(window)
         self.fortress = fortress
-        self.selected_soldier = [self.fortress.guest, 0]
+        self.selected_soldier = [self.fortress.shop, 0]
 
     def up_down_event(self, key):
         if key == 'w':
@@ -17,18 +19,16 @@ class FortressScreen(Screen):
         self.selected_soldier[1] = new_index
 
     def right_left_event(self, key):
-        new_squad = self.selected_soldier[0]
+        items = [self.fortress.garrison, self.fortress.guest, self.fortress.shop]
         if key == 'a':
-            if new_squad == self.fortress.garrison:
-                new_squad = self.fortress.guest
-            elif new_squad == self.fortress.shop:
-                new_squad = self.fortress.garrison
+            new_squad_index = (items.index(self.selected_soldier[0])
+                               - 1) % len(items)
         else:
-            if new_squad == self.fortress.guest:
-                new_squad = self.fortress.garrison
-            elif new_squad == self.fortress.garrison:
-                new_squad = self.fortress.shop
-        self.selected_soldier[0] = new_squad
+            new_squad_index = (items.index(self.selected_soldier[0])
+                               + 1) % len(items)
+        if len(items[new_squad_index]):
+            self.selected_soldier[0] = items[new_squad_index]
+            self.selected_soldier[1] = 0
 
     def equip_event(self):
         if self.selected_soldier[0] == self.fortress.shop:
@@ -48,7 +48,34 @@ class FortressScreen(Screen):
             self.equip_event()
 
     def draw(self):
-        pass
+        columns = [[]]
+        for i in self.fortress.garrison:
+            columns[-1].append({'hp': i.hp, 'attack': i.attack, 'armor': i.armor})
+        if self.selected_soldier[0] == self.fortress.garrison:
+            columns[-1][self.selected_soldier[1]]['selected'] = True
+
+        columns.append([])
+        for i in self.fortress.guest:
+            columns[-1].append({'hp': i.hp, 'attack': i.attack, 'armor': i.armor})
+        if self.selected_soldier[0] == self.fortress.guest:
+            columns[-1][self.selected_soldier[1]]['selected'] = True
+
+        columns.append([])
+        for i in self.fortress.shop:
+            columns[-1].append({'attack': i[0].attack, 'armor': i[0].armor, 'cost': i[1]})
+        if self.selected_soldier[0] == self.fortress.shop:
+            columns[-1][self.selected_soldier[1]]['selected'] = True
+
+        for i in range(3):
+            for j in columns[i]:
+                line = columns[i][j]
+                self.window.graphics_facade.draw_line_background(i, j, 'selected' in line.keys())
+                if 'hp' in line.keys():
+                    self.window.graphics_facade.draw_line_text(i, j, str(line['hp']), 0)
+                self.window.graphics_facade.draw_line_text(i, j, str(line['attack']), 1)
+                self.window.graphics_facade.draw_line_text(i, j, str(line['armor']), 2)
+                if 'cost' in line.keys():
+                    self.window.graphics_facade.draw_line_text(i, j, str(line['cost']), 3)
 
 
 class MapScreen(Screen):

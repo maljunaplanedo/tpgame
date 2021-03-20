@@ -35,6 +35,8 @@ class GraphicsFacade:
 class GtkCairoFacade(GraphicsFacade):
 
     CELL_SIZE = 40
+    LINE_HEIGHT = 40
+    LINE_WIDTH = 640 / 3
 
     def __init__(self, window):
         super().__init__(window)
@@ -74,11 +76,23 @@ class GtkCairoFacade(GraphicsFacade):
         self.cr.fill()
 
     def draw_ground(self, x1, y1, x2, y2):
-        self.cr.set_source_rgb(1, 1, 0)
-        self.cr.rectangle(x1 * self.CELL_SIZE, y1 * self.CELL_SIZE,
-                          (x2 - x1 + 1) * self.CELL_SIZE,
-                          (y2 - y1 + 1) * self.CELL_SIZE)
-        self.cr.fill()
+
+        width = (x2 - x1 + 1) * self.CELL_SIZE
+        height = (y2 - y1 + 1) * self.CELL_SIZE
+
+        image_surface = cairo.ImageSurface.create_from_png('background.png')
+        img_height = image_surface.get_height()
+        img_width = image_surface.get_width()
+
+        width_ratio = float(width) / float(img_width)
+        height_ratio = float(height) / float(img_height)
+
+        self.cr.save()
+        self.cr.translate(x1 * self.CELL_SIZE, y1 * self.CELL_SIZE)
+        self.cr.scale(width_ratio, height_ratio)
+        self.cr.set_source_surface(image_surface)
+        self.cr.paint()
+        self.cr.restore()
 
     def draw_squad(self, owner, x, y):
         if owner == 1:
@@ -103,6 +117,29 @@ class GtkCairoFacade(GraphicsFacade):
         self.cr.rectangle(x * self.CELL_SIZE, y * self.CELL_SIZE,
                           self.CELL_SIZE, self.CELL_SIZE)
         self.cr.fill()
+
+    def draw_line_background(self, col, row, is_selected):
+        if is_selected:
+            self.cr.set_source_rgb(1, 1, 1)
+        else:
+            self.cr.set_source_rgb(0, 0, 0)
+        self.cr.rectangle(col * self.LINE_WIDTH, row * self.LINE_HEIGHT,
+                          self.LINE_WIDTH, self.LINE_HEIGHT)
+
+    def draw_line_text(self, col, row, text, pos):
+        if pos == 0:
+            self.cr.set_source_rgb(0, 1, 0)
+        elif pos == 1:
+            self.cr.set_source_rgb(1, 0, 0)
+        elif pos == 2:
+            self.cr.set_source_rgb(0, 0, 1)
+        else:
+            self.cr.set_source_rgb(1, 1, 0)
+
+        self.cr.move_to(col * self.LINE_WIDTH + pos * self.LINE_WIDTH / 4,
+                        row * self.LINE_HEIGHT)
+
+        self.cr.show_text(text)
 
 
 class Screen:

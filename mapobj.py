@@ -439,6 +439,9 @@ class Squad(IMapObjInfoConvertible):
 
         return info
 
+    def __len__(self):
+        return len(self.soldiers)
+
     def reset_from_info(self, info):
         self.x = info['x']
         self.y = info['y']

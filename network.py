@@ -34,7 +34,6 @@ class Network:
     @staticmethod
     def encode_message(message):
         message = json.dumps(message).encode()
-        print(len(message))
         message += b'#' * (Network.MESSAGE_LEN - len(message))
 
         return message
