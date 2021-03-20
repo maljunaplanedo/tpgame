@@ -13,9 +13,9 @@ class FortressScreen(Screen):
 
     def up_down_event(self, key):
         if key == 'w':
-            new_index = min(0, self.selected_soldier[1] - 1)
+            new_index = max(0, self.selected_soldier[1] - 1)
         else:
-            new_index = max(len(self.selected_soldier[0]) - 1, self.selected_soldier[1] + 1)
+            new_index = min(len(self.selected_soldier[0]) - 1, self.selected_soldier[1] + 1)
         self.selected_soldier[1] = new_index
 
     def right_left_event(self, key):
