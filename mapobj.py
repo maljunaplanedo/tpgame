@@ -92,8 +92,8 @@ class Fortress(IMapObjInfoConvertible):
 
     def move_soldier(self, index, to_guest):
         from_, to_ = (self.garrison, self.guest) if to_guest else (self.guest, self.garrison)
-        to_.append(from_[index])
-        from_.pop(index)
+        to_.add_soldier(from_[index])
+        from_.soldiers.pop(index)
 
     def close_fortress_menu(self):
         screens.MapScreen(self.game.window, self.game.map).open_()
