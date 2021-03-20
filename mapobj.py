@@ -132,6 +132,7 @@ class Fortress(IMapObjInfoConvertible):
         self.close_fortress_menu()
         if not self.game.map.check_game_end():
             self.game.map.check_turn_end()
+        self.game.window.redraw()
 
 
 class Map(INetworkEventSubscriber, IMapObjInfoConvertible):
