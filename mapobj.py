@@ -129,6 +129,8 @@ class Fortress(IMapObjInfoConvertible):
             self.game.map.selected_squad = self.guest
             self.guest.move(0, -1)
 
+        self.game.map.moves_left -= 1
+
         self.guest = None
         self.game.map.clear_squads()
         self.close_fortress_menu()
@@ -138,10 +140,10 @@ class Fortress(IMapObjInfoConvertible):
 
 
 class Map(INetworkEventSubscriber, IMapObjInfoConvertible):
-    WIDTH = 64
-    HEIGHT = 64
-    FORTRESSES_NUMBER = 12
-    ONE_TURN_MOVES = 10
+    WIDTH = 10
+    HEIGHT = 10
+    FORTRESSES_NUMBER = 1
+    ONE_TURN_MOVES = 100
 
     def __init__(self, game):
         self.game = game
@@ -261,6 +263,7 @@ class Map(INetworkEventSubscriber, IMapObjInfoConvertible):
 
         if fort_at_cell:
             fort_at_cell[0].accept_visitor(self.selected_squad)
+            self.moves_left += 1
         elif len(squads_at_cell) == 2:
             other_squad = (squads_at_cell[0] if squads_at_cell[1]
                            is self.selected_squad else squads_at_cell[1])

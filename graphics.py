@@ -146,6 +146,10 @@ class GtkCairoFacade(GraphicsFacade):
 
         self.cr.show_text(text)
 
+    def draw_end_text(self, text):
+        self.cr.move_to(self.window.width / 2, self.window.height / 2)
+        self.cr.show_text(text)
+
 
 class Screen:
 

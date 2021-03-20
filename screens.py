@@ -49,7 +49,6 @@ class FortressScreen(Screen):
         self.fortress.throw_guest_away()
 
     def keyboard_event(self, key):
-        print(self.window.game.map.get_info())
         if key in ['w', 's']:
             self.up_down_event(key)
         elif key in ['a', 'd']:
@@ -166,7 +165,13 @@ class EndScreen(Screen):
         self.result = result
 
     def keyboard_event(self, key):
-        pass
+        self.window.close()
 
     def draw(self):
-        pass
+        if self.result == 0:
+            text = "Win"
+        elif self.result == 1:
+            text = "Lose"
+        else:
+            text = "Draw"
+        self.window.graphics_facade.draw_end_text(text)
