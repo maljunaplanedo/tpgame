@@ -12,7 +12,7 @@ class INetworkEventSubscriber:
 
 
 class Network:
-    MESSAGE_LEN = 4096
+    MESSAGE_LEN = 32768
 
     def __init__(self):
         self.subscribers = defaultdict(list)
@@ -52,11 +52,25 @@ class Network:
             self.socket.bind(('', self.target_port))
             self.socket.listen(1)
             self.socket.setblocking(False)
-            self.socket, address = self.socket.accept()
+
+            while True:
+                try:
+                    self.socket, address = self.socket.accept()
+                    break
+                except BlockingIOError:
+                    pass
+
             self.cause_event('connect', {'host': True})
         else:
             self.socket.setblocking(False)
-            self.socket.connect((self.target_ip, self.target_port))
+
+            while True:
+                try:
+                    self.socket.connect((self.target_ip, self.target_port))
+                    break
+                except BlockingIOError:
+                    pass
+
             self.cause_event('connect', {'host': False})
 
     def __del__(self):
