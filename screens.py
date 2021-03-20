@@ -49,13 +49,13 @@ class FortressScreen(Screen):
 
     def draw(self):
         columns = [[]]
-        for i in self.fortress.garrison:
+        for i in self.fortress.garrison.soldiers:
             columns[-1].append({'hp': i.hp, 'attack': i.attack, 'armor': i.armor})
         if self.selected_soldier[0] == self.fortress.garrison:
             columns[-1][self.selected_soldier[1]]['selected'] = True
 
         columns.append([])
-        for i in self.fortress.guest:
+        for i in self.fortress.guest.soldiers:
             columns[-1].append({'hp': i.hp, 'attack': i.attack, 'armor': i.armor})
         if self.selected_soldier[0] == self.fortress.guest:
             columns[-1][self.selected_soldier[1]]['selected'] = True
