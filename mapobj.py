@@ -126,6 +126,7 @@ class Fortress(IMapObjInfoConvertible):
             self.game.map.move_selected_squad(0, -1)
         self.guest = None
         self.close_fortress_menu()
+        self.game.map.check_turn_end()
 
 
 class Map(INetworkEventSubscriber, IMapObjInfoConvertible):
