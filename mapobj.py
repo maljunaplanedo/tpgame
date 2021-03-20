@@ -121,12 +121,17 @@ class Fortress(IMapObjInfoConvertible):
 
     def throw_guest_away(self):
         self.check_garrison_existence()
-        if not self.guest.empty():
+        if self.guest.empty():
+            self.game.map.selected_squad = self.garrison
+        else:
             self.game.map.selected_squad = self.guest
             self.game.map.move_selected_squad(0, -1)
+
         self.guest = None
+        self.game.map.clear_squads()
         self.close_fortress_menu()
-        self.game.map.check_turn_end()
+        if not self.game.map.check_game_end():
+            self.game.map.check_turn_end()
 
 
 class Map(INetworkEventSubscriber, IMapObjInfoConvertible):
