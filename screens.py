@@ -35,9 +35,9 @@ class FortressScreen(Screen):
             self.fortress.recruit_soldier(self.selected_soldier[1])
         else:
             self.fortress.move_soldier(
-                                       self.selected_soldier[1],
-                                       self.selected_soldier[0] == self.fortress.guest
-                                       )
+                self.selected_soldier[1],
+                self.selected_soldier[0] == self.fortress.guest
+            )
 
     def keyboard_event(self, key):
         if key in ['w', 's']:
@@ -52,7 +52,6 @@ class FortressScreen(Screen):
 
 
 class MapScreen(Screen):
-
     WINDOW_CELL_WIDTH = 16
     WINDOW_CELL_HEIGHT = 12
 
@@ -85,6 +84,9 @@ class MapScreen(Screen):
             self.change_squad_event(key)
 
     def draw(self):
+        if self.map.turn is None:
+            pass
+
         if self.map.selected_squad.is_garrison():
             fort = self.map.get_fort_by_garrison(self.map.selected_squad)
             camera_x = fort.x
