@@ -31,6 +31,36 @@ class GraphicsFacade:
     def draw_fortress(self, owner, x, y):
         pass
 
+    @abstractmethod
+    def draw_background(self, black=False):
+        pass
+
+    @abstractmethod
+    def draw_line_background(self, col, row, is_selected):
+        pass
+
+    @abstractmethod
+    def draw_line_text(self, col, row, text, pos):
+        pass
+
+    @abstractmethod
+    def draw_end_text(self, text):
+        pass
+
+    @abstractmethod
+    def draw_panel_background(self):
+        pass
+
+    @abstractmethod
+    def draw_gold(self, gold):
+        pass
+
+    @abstractmethod
+    def draw_moves_left(self, moves):
+        pass
+
+
+
 
 class GtkCairoFacade(GraphicsFacade):
 
