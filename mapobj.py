@@ -225,7 +225,6 @@ class Map(INetworkEventSubscriber, IMapObjInfoConvertible):
 
     def on_network_connected(self, is_host):
         if is_host:
-            print('here')
             self.generate_map()
             self.send_state()
 
