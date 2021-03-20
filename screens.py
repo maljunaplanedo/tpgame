@@ -36,7 +36,7 @@ class FortressScreen(Screen):
         else:
             self.fortress.move_soldier(
                 self.selected_soldier[1],
-                self.selected_soldier[0] == self.fortress.guest
+                self.selected_soldier[0] != self.fortress.guest
             )
 
     def exit_event(self):
