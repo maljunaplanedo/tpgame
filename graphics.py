@@ -142,7 +142,7 @@ class GtkCairoFacade(GraphicsFacade):
             self.cr.set_source_rgb(1, 1, 0)
 
         self.cr.move_to(col * self.LINE_WIDTH + pos * self.LINE_WIDTH / 4,
-                        (row + 1.5) * self.LINE_HEIGHT)
+                        row * self.LINE_HEIGHT + self.LINE_HEIGHT / 2)
 
         self.cr.show_text(text)
 
