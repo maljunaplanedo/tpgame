@@ -40,7 +40,7 @@ class FortressScreen(Screen):
             )
 
     def exit_event(self):
-        self.fortress.close_fortress_menu()
+        self.fortress.throw_guest_away()
 
     def keyboard_event(self, key):
         if key in ['w', 's']:
