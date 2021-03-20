@@ -100,9 +100,10 @@ class MapScreen(Screen):
         diff_x = camera_x - self.WINDOW_CELL_WIDTH // 2 + 1
         diff_y = camera_y - self.WINDOW_CELL_HEIGHT // 2 + 1
 
+        self.window.graphics_facade.draw_background()
         self.window.graphics_facade.draw_ground(-diff_x, -diff_y,
-                                                self.map.WIDTH - diff_x,
-                                                self.map.HEIGHT - diff_y)
+                                                self.map.WIDTH - diff_x - 1,
+                                                self.map.HEIGHT - diff_y - 1)
 
         for i in self.map.fortresses:
             player_code = self.map.get_player_code(i.master)

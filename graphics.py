@@ -69,6 +69,10 @@ class GtkCairoFacade(GraphicsFacade):
         rect = self.gtk_draw_area.get_allocation()
         self.gtk_draw_area.get_window().invalidate_rect(rect, True)
 
+    def draw_background(self):
+        self.cr.set_source_rgb(1, 1, 1)
+        self.cr.fill()
+
     def draw_ground(self, x1, y1, x2, y2):
         self.cr.set_source_rgb(1, 1, 0)
         self.cr.rectangle(x1 * self.CELL_SIZE, y1 * self.CELL_SIZE,
@@ -90,9 +94,11 @@ class GtkCairoFacade(GraphicsFacade):
 
     def draw_fortress(self, owner, x, y):
         if owner == 1:
+            self.cr.set_source_rgb(0, 0, 1)
+        elif owner == 0:
             self.cr.set_source_rgb(1, 0, 0)
         else:
-            self.cr.set_source_rgb(0, 0, 1)
+            self.cr.set_source_rgb(0, 0, 0)
 
         self.cr.rectangle(x * self.CELL_SIZE, y * self.CELL_SIZE,
                           self.CELL_SIZE, self.CELL_SIZE)
