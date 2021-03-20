@@ -102,6 +102,7 @@ class GtkCairoFacade(GraphicsFacade):
 
         self.cr.rectangle(x * self.CELL_SIZE, y * self.CELL_SIZE,
                           self.CELL_SIZE, self.CELL_SIZE)
+        self.cr.fill()
 
 
 class Screen:
