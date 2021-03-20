@@ -129,8 +129,8 @@ class Fortress(IMapObjInfoConvertible):
 
 
 class Map(INetworkEventSubscriber, IMapObjInfoConvertible):
-    WIDTH = 128
-    HEIGHT = 128
+    WIDTH = 64
+    HEIGHT = 64
     FORTRESSES_NUMBER = 12
     ONE_TURN_MOVES = 10
 
