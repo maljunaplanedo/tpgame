@@ -78,9 +78,9 @@ class GtkCairoFacade(GraphicsFacade):
 
     def draw_squad(self, owner, x, y):
         if owner == 1:
-            self.cr.set_source_rgb(1, 0, 0)
-        else:
             self.cr.set_source_rgb(0, 0, 1)
+        else:
+            self.cr.set_source_rgb(1, 0, 0)
 
         self.cr.arc(x * self.CELL_SIZE + self.CELL_SIZE / 2,
                     y * self.CELL_SIZE + self.CELL_SIZE / 2,

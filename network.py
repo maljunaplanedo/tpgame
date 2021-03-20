@@ -60,6 +60,7 @@ class Network:
                 except BlockingIOError:
                     pass
 
+            self.socket.setblocking(False)
             self.cause_event('connect', {'host': True})
         else:
             self.socket.setblocking(False)
