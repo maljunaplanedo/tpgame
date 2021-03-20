@@ -2,7 +2,7 @@ import random
 from network import INetworkEventSubscriber
 import copy
 from abc import abstractmethod
-from screens import EndScreen, MapScreen, FortressScreen
+import screens
 
 
 # Composite pattern
@@ -69,7 +69,7 @@ class Fortress(IMapObjInfoConvertible):
             self.shop[-1][0].reset_from_info(i[0])
 
     def open_fortress_menu(self):
-        FortressScreen(self.game.window, self).open_()
+        screens.FortressScreen(self.game.window, self).open_()
 
     def change_master(self, master):
         self.master = master
@@ -96,7 +96,7 @@ class Fortress(IMapObjInfoConvertible):
         from_.pop(index)
 
     def close_fortress_menu(self):
-        MapScreen(self.game.window, self.game.map).open_()
+        screens.MapScreen(self.game.window, self.game.map).open_()
 
     def check_garrison_existence(self):
         if self.garrison.empty():
@@ -238,9 +238,13 @@ class Map(INetworkEventSubscriber, IMapObjInfoConvertible):
             fort.open_fortress_menu()
             return
 
-        self.selected_squad.move(dx, dy)
         x = self.selected_squad.x
         y = self.selected_squad.y
+        x += dx
+        y += dy
+        if not self.is_valid_cell(x, y):
+            return
+        self.selected_squad.move(dx, dy)
 
         squads_at_cell = self.squads_at_cell(x, y)
         fort_at_cell = self.forts_at_cell(x, y)
@@ -249,7 +253,7 @@ class Map(INetworkEventSubscriber, IMapObjInfoConvertible):
             fort_at_cell[0].accept_visitor(self.selected_squad)
         elif len(squads_at_cell) == 2:
             other_squad = (squads_at_cell[0] if squads_at_cell[1]
-                                                is self.selected_squad else squads_at_cell[0])
+                           is self.selected_squad else squads_at_cell[0])
             self.selected_squad.interact(other_squad)
 
         self.clear_squads()
@@ -261,7 +265,7 @@ class Map(INetworkEventSubscriber, IMapObjInfoConvertible):
             self.check_turn_end()
 
     def end_game(self, result):
-        EndScreen(self.game.window, result).open_()
+        screens.EndScreen(self.game.window, result).open_()
 
     def check_game_end(self):
         protagonist_forts =\
@@ -328,8 +332,11 @@ class Map(INetworkEventSubscriber, IMapObjInfoConvertible):
         return [fort for fort in self.fortresses
                 if fort.x == x and fort.y == y]
 
+    def is_valid_cell(self, x, y):
+        return x in range(self.WIDTH) and y in range(self.HEIGHT)
+
     def is_empty_cell(self, x, y):
-        return (x in range(self.WIDTH) and y in range(self.HEIGHT) and
+        return (self.is_valid_cell(x, y) and
                 not self.squads_at_cell(x, y) and
                 not self.forts_at_cell(x, y))
 

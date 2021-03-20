@@ -1,4 +1,4 @@
-from map import Map
+from mapobj import Map
 from network import Network
 from graphics import Window
 from screens import MapScreen

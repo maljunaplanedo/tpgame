@@ -19,8 +19,23 @@ class GraphicsFacade:
     def redraw(self):
         pass
 
+    @abstractmethod
+    def draw_ground(self, x1, y1, x2, y2):
+        pass
+
+    @abstractmethod
+    def draw_squad(self, owner, x, y):
+        pass
+
+    @abstractmethod
+    def draw_fortress(self, owner, x, y):
+        pass
+
 
 class GtkCairoFacade(GraphicsFacade):
+
+    CELL_SIZE = 40
+
     def __init__(self, window):
         super().__init__(window)
         self.gtk_window = Gtk.Window()
@@ -53,6 +68,34 @@ class GtkCairoFacade(GraphicsFacade):
     def redraw(self):
         rect = self.gtk_draw_area.get_allocation()
         self.gtk_draw_area.get_window().invalidate_rect(rect, True)
+
+    def draw_ground(self, x1, y1, x2, y2):
+        self.cr.set_source_rgb(1, 1, 0)
+        self.cr.rectangle(x1 * self.CELL_SIZE, y1 * self.CELL_SIZE,
+                          (x2 - x1 + 1) * self.CELL_SIZE,
+                          (y2 - y1 + 1) * self.CELL_SIZE)
+        self.cr.fill()
+
+    def draw_squad(self, owner, x, y):
+        if owner == 1:
+            self.cr.set_source_rgb(1, 0, 0)
+        else:
+            self.cr.set_source_rgb(0, 0, 1)
+
+        self.cr.arc(x * self.CELL_SIZE + self.CELL_SIZE / 2,
+                    y * self.CELL_SIZE + self.CELL_SIZE / 2,
+                    self.CELL_SIZE / 2,
+                    0, 2 * math.pi)
+        self.cr.fill()
+
+    def draw_fortress(self, owner, x, y):
+        if owner == 1:
+            self.cr.set_source_rgb(1, 0, 0)
+        else:
+            self.cr.set_source_rgb(0, 0, 1)
+
+        self.cr.rectangle(x * self.CELL_SIZE, y * self.CELL_SIZE,
+                          self.CELL_SIZE, self.CELL_SIZE)
 
 
 class Screen:
@@ -102,3 +145,11 @@ class Window:
     def keyboard_event(self, key):
         self.screen.keyboard_event(key)
         self.redraw()
+
+    @property
+    def width(self):
+        return self.WIDTH
+
+    @property
+    def height(self):
+        return self.HEIGHT
