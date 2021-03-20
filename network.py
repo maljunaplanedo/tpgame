@@ -114,7 +114,7 @@ class Network:
                 self.receive_message()
                 self.receiving_message = b''
 
-        except socket.timeout:
+        except BlockingIOError:
             pass
 
     def send_iteration(self):
@@ -127,7 +127,7 @@ class Network:
             if not self.sending_messages[0]:
                 self.sending_messages.popleft()
 
-        except socket.timeout:
+        except BlockingIOError:
             pass
 
     def iteration(self):
