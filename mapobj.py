@@ -18,7 +18,7 @@ class IMapObjInfoConvertible:
 
 class Player(IMapObjInfoConvertible):
     def __init__(self, map_):
-        self.gold = 100000
+        self.gold = 500
         self.map = map_
 
     def get_info(self):
@@ -142,8 +142,8 @@ class Fortress(IMapObjInfoConvertible):
 
 
 class Map(INetworkEventSubscriber, IMapObjInfoConvertible):
-    WIDTH = 64
-    HEIGHT = 64
+    WIDTH = 32
+    HEIGHT = 32
     FORTRESSES_NUMBER = 12
     ONE_TURN_MOVES = 10
 
