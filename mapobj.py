@@ -134,6 +134,9 @@ class Fortress(IMapObjInfoConvertible):
         self.guest = None
         self.game.map.clear_squads()
         self.close_fortress_menu()
+
+        self.game.map.send_state()
+
         if not self.game.map.check_game_end():
             self.game.map.check_turn_end()
         self.game.window.redraw()
