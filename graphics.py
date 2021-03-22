@@ -59,6 +59,10 @@ class GraphicsFacade:
     def draw_moves_left(self, moves):
         pass
 
+    @abstractmethod
+    def draw_target(self, row, col):
+        pass
+
 
 
 
@@ -202,6 +206,12 @@ class GtkCairoFacade(GraphicsFacade):
         self.cr.set_source_rgb(0, 0, 1)
         self.cr.set_font_size(24)
         self.cr.show_text(str(moves))
+    
+    def draw_target(self, row, col):
+        self.cr.set_source_rgb(0, 1, 0)
+        self.cr.arc(row * self.CELL_SIZE + self.CELL_SIZE // 2, col * self.CELL_SIZE + self.CELL_SIZE // 2,
+                    5, 0, 2 * math.pi)
+        self.cr.fill()
 
 
 class Screen:
