@@ -90,7 +90,7 @@ class FortressScreen(Screen):
                 if 'cost' in line.keys():
                     self.window.graphics_facade.draw_line_text(i, j, str(line['cost']), 3)
 
-        self.window.graphics_facade.draw_gold_panel_background()
+        self.window.graphics_facade.draw_panel_background()
         self.window.graphics_facade.draw_gold(self.fortress.master.gold)
 
 
