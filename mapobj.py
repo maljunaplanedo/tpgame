@@ -125,7 +125,6 @@ class Fortress(IMapObjInfoConvertible):
         self.check_garrison_existence()
         if self.guest.empty():
             self.game.map.selected_squad = self.garrison
-            self.game.map.moves_left -= 1
         else:
             self.game.map.selected_squad = self.guest
             self.game.map.move_selected_squad(0, -1)
