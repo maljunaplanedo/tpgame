@@ -417,8 +417,8 @@ class Soldier(IMapObjInfoConvertible):
         return self.hp > 0
 
     def fight(self, enemy):
-        my_attack = self.attack * (100 - enemy.armor) // 100
-        enemy_attack = enemy.attack * (100 - self.armor) // 100
+        my_attack = self.attack * (100 - enemy.armor) // 100 + 1
+        enemy_attack = enemy.attack * (100 - self.armor) // 100 + 1
         self.hp -= enemy_attack
         enemy.hp -= my_attack
 
