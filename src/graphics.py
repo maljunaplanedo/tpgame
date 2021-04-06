@@ -120,7 +120,7 @@ class GtkCairoFacade(GraphicsFacade):
         width = (x2 - x1 + 1) * self.CELL_SIZE
         height = (y2 - y1 + 1) * self.CELL_SIZE
 
-        image_surface = cairo.ImageSurface.create_from_png('background.png')
+        image_surface = cairo.ImageSurface.create_from_png('images/background.png')
         img_height = image_surface.get_height()
         img_width = image_surface.get_width()
 
