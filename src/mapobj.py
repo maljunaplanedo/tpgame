@@ -1,8 +1,8 @@
 import random
-from network import INetworkEventSubscriber
+from .network import INetworkEventSubscriber
 import copy
 from abc import abstractmethod
-import screens
+from . import screens
 
 
 # Composite pattern
@@ -417,8 +417,8 @@ class Soldier(IMapObjInfoConvertible):
         return self.hp > 0
 
     def fight(self, enemy):
-        my_attack = self.attack * (100 - enemy.armor) // 100 + 1
-        enemy_attack = enemy.attack * (100 - self.armor) // 100 + 1
+        my_attack = self.attack * (100 - enemy.armor) // 100
+        enemy_attack = enemy.attack * (100 - self.armor) // 100
         self.hp -= enemy_attack
         enemy.hp -= my_attack
 

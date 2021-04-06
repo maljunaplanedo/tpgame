@@ -1,6 +1,6 @@
-from graphics import Screen
-from graphics import Window
-import mapobj
+from .graphics import Screen
+from .graphics import Window
+from . import mapobj
 
 
 class FortressScreen(Screen):
