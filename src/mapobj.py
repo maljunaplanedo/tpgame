@@ -2,7 +2,7 @@ import random
 from .network import INetworkEventSubscriber
 import copy
 from abc import abstractmethod
-from . import screens
+from .graphic import screens
 
 
 # Composite pattern

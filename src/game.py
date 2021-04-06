@@ -1,7 +1,7 @@
 from .mapobj import Map
 from .network import Network
-from .graphics import Window
-from .screens import MapScreen
+from .graphic.graphics import Window
+from .graphic.screens import MapScreen
 
 
 class Game:
