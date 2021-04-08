@@ -1,4 +1,4 @@
-from .mapobj import Map
+from .map_ import Map
 from .network import Network
 from .graphic.graphics import Window
 from .graphic.screens import MapScreen
