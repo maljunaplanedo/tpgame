@@ -7,14 +7,14 @@ import json
 # Observer pattern
 class INetworkEventSubscriber:
     @abstractmethod
-    def handle_network_event(self, type_, event):
+    def handle_network_event(self, type_: str, event: dict) -> None:
         pass
 
 
 class Network:
     MESSAGE_LEN = 16384
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.subscribers = defaultdict(list)
         self.socket = socket.socket()
         self.receiving_message = b''
@@ -24,30 +24,30 @@ class Network:
         self.target_port = 0
         self.is_host = False
 
-    def open_network_info_screen(self):
+    def open_network_info_screen(self) -> None:
         pass
 
-    def cause_event(self, type_, event):
+    def cause_event(self, type_: str, event: dict) -> None:
         for sub in self.subscribers[type_]:
             sub.handle_network_event(type_, event)
 
     @staticmethod
-    def encode_message(message):
+    def encode_message(message: str) -> str:
         message = json.dumps(message).encode()
         message += b'#' * (Network.MESSAGE_LEN - len(message))
 
         return message
 
     @staticmethod
-    def decode_message(message):
+    def decode_message(message: str) -> dict:
         message = message.rstrip(b'#')
         return json.loads(message.decode())
 
-    def send_message(self, message):
+    def send_message(self, message: str) ->  None:
         message = self.encode_message(message)
         self.sending_messages.append(message)
 
-    def connect(self):
+    def connect(self) -> None:
         if self.is_host:
             self.socket.bind(('', self.target_port))
             self.socket.listen(1)
@@ -74,13 +74,13 @@ class Network:
 
             self.cause_event('connect', {'host': False})
 
-    def __del__(self):
+    def __del__(self) -> None:
         self.socket.close()
 
-    def subscribe(self, type_, subscriber):
+    def subscribe(self, type_: str, subscriber) -> None:
         self.subscribers[type_].append(subscriber)
 
-    def check_file_data(self):
+    def check_file_data(self) -> bool:
         try:
             with open('netconfig.txt', 'r') as f:
                 file = f.read()
@@ -101,13 +101,13 @@ class Network:
         except ValueError:
             exit(0)
 
-    def receive_message(self):
+    def receive_message(self) -> None:
         msg = self.decode_message(self.receiving_message)
         type_ = msg['type']
         event = msg['event']
         self.cause_event(type_, event)
 
-    def receive_iteration(self):
+    def receive_iteration(self) -> None:
         try:
             self.receiving_message +=\
                 self.socket.recv(self.MESSAGE_LEN - len(self.receiving_message))
@@ -118,7 +118,7 @@ class Network:
         except BlockingIOError:
             pass
 
-    def send_iteration(self):
+    def send_iteration(self) -> None:
         if not self.sending_messages:
             return
         try:

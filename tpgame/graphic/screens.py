@@ -1,24 +1,23 @@
-from .graphics import Screen
-from .graphics import Window
-from src import mapobj
+from tpgame.graphic.graphics import Screen
+from tpgame.graphic.graphics import Window
 
 
 class FortressScreen(Screen):
     WINDOW_LINE_HEIGHT = 12
 
-    def __init__(self, window, fortress):
+    def __init__(self, window: Window, fortress) -> None:
         super().__init__(window)
         self.fortress = fortress
         self.selected_soldier = [self.fortress.shop, 0]
 
-    def up_down_event(self, key):
+    def up_down_event(self, key) -> None:
         if key == 'w':
             new_index = max(0, self.selected_soldier[1] - 1)
         else:
             new_index = min(len(self.selected_soldier[0]) - 1, self.selected_soldier[1] + 1)
         self.selected_soldier[1] = new_index
 
-    def right_left_event(self, key):
+    def right_left_event(self, key) -> None:
         items = [self.fortress.garrison, self.fortress.guest, self.fortress.shop]
         if key == 'a':
             new_squad_index = (items.index(self.selected_soldier[0])
@@ -30,7 +29,7 @@ class FortressScreen(Screen):
             self.selected_soldier[0] = items[new_squad_index]
             self.selected_soldier[1] = 0
 
-    def equip_event(self):
+    def equip_event(self) -> None:
         if self.selected_soldier[0] == self.fortress.shop:
             self.fortress.recruit_soldier(self.selected_soldier[1])
         else:
@@ -45,10 +44,10 @@ class FortressScreen(Screen):
             else:
                 self.selected_soldier[1] -= 1
 
-    def exit_event(self):
+    def exit_event(self) -> None:
         self.fortress.throw_guest_away()
 
-    def keyboard_event(self, key):
+    def keyboard_event(self, key) -> None:
         if key in ['w', 's']:
             self.up_down_event(key)
         elif key in ['a', 'd']:
@@ -58,7 +57,7 @@ class FortressScreen(Screen):
         elif key == 'Escape':
             self.exit_event()
 
-    def draw(self):
+    def draw(self) -> None:
         self.window.graphics_facade.draw_background(True)
 
         columns = [[]]
@@ -98,11 +97,11 @@ class MapScreen(Screen):
     WINDOW_CELL_WIDTH = 16
     WINDOW_CELL_HEIGHT = 12
 
-    def __init__(self, window: Window, map_):
+    def __init__(self, window: Window, map_) -> None:
         super().__init__(window)
         self.map = map_
 
-    def movement_event(self, key):
+    def movement_event(self, key) -> None:
         if key == 'w':
             movement = (0, -1)
         elif key == 'a':
@@ -113,14 +112,14 @@ class MapScreen(Screen):
             movement = (1, 0)
         self.map.move_selected_squad(*movement)
 
-    def change_squad_event(self, key):
+    def change_squad_event(self, key) -> None:
         if key == 'Right':
             delta = 1
         else:
             delta = -1
         self.map.select_other_squad(delta)
 
-    def keyboard_event(self, key):
+    def keyboard_event(self, key) -> None:
         if self.map.turn != self.map.protagonist:
             return
         if key in ['w', 'a', 's', 'd']:
@@ -128,7 +127,7 @@ class MapScreen(Screen):
         elif key in ['Left', 'Right']:
             self.change_squad_event(key)
 
-    def draw(self):
+    def draw(self) -> None:
         if self.map.turn is None:
             return
 
@@ -169,14 +168,14 @@ class MapScreen(Screen):
 
 
 class EndScreen(Screen):
-    def __init__(self, window: Window, result: int):
+    def __init__(self, window: Window, result: int) -> None:
         super().__init__(window)
         self.result = result
 
-    def keyboard_event(self, key):
+    def keyboard_event(self, key) -> None:
         self.window.close()
 
-    def draw(self):
+    def draw(self) -> None:
         if self.result == 0:
             text = "Win"
         elif self.result == 1:

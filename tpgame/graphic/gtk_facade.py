@@ -3,7 +3,7 @@ import cairo
 import math
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, Gdk, GObject
-from .grafics_facade import *
+from tpgame.graphic.grafics_facade import GraphicsFacade
 
 class GtkCairoFacade(GraphicsFacade):
 
@@ -13,7 +13,7 @@ class GtkCairoFacade(GraphicsFacade):
     GOLD_PANEL_HEIGHT = 40
     GOLD_PANEL_WIDTH = 300
 
-    def __init__(self, window):
+    def __init__(self, window) -> None:
         super().__init__(window)
         self.gtk_window = Gtk.Window()
         self.gtk_window.connect('destroy', self.close)
@@ -27,26 +27,26 @@ class GtkCairoFacade(GraphicsFacade):
         self.gtk_window.present()
         self.cr = None
 
-    def iteration(self):
+    def iteration(self) -> None:
         while Gtk.events_pending():
             Gtk.main_iteration()
 
-    def keyboard_event(self, widget, event):
+    def keyboard_event(self, widget: gi.overrides.Gtk.Window, event : gi.overrides.Gdk.EventKey) -> None:
         key = Gdk.keyval_name(event.keyval)
         self.window.keyboard_event(key)
 
-    def close(self, event):
+    def close(self, event) -> None:
         self.window.close()
 
-    def draw(self, widget, event):
+    def draw(self, widget: gi.overrides.Gtk.Window, event: gi.overrides.Gdk.EventKey) -> None:
         self.cr = self.gtk_draw_area.get_window().cairo_create()
         self.window.draw()
 
-    def redraw(self):
+    def redraw(self) -> None:
         rect = self.gtk_draw_area.get_allocation()
         self.gtk_draw_area.get_window().invalidate_rect(rect, True)
 
-    def draw_background(self, black=False):
+    def draw_background(self, black: bool=False) -> None:
         if black:
             self.cr.set_source_rgb(0, 0, 0)
         else:
@@ -54,7 +54,7 @@ class GtkCairoFacade(GraphicsFacade):
         self.cr.rectangle(0, 0, self.window.width, self.window.height)
         self.cr.fill()
 
-    def draw_ground(self, x1, y1, x2, y2):
+    def draw_ground(self, x1: int, y1 : int, x2: int, y2: int) -> None:
 
         width = (x2 - x1 + 1) * self.CELL_SIZE
         height = (y2 - y1 + 1) * self.CELL_SIZE
@@ -73,7 +73,7 @@ class GtkCairoFacade(GraphicsFacade):
         self.cr.paint()
         self.cr.restore()
 
-    def draw_squad(self, owner, x, y):
+    def draw_squad(self, owner : int, x : int, y : int) -> None:
         if owner == 1:
             self.cr.set_source_rgb(0, 0, 1)
         else:
@@ -85,7 +85,7 @@ class GtkCairoFacade(GraphicsFacade):
                     0, 2 * math.pi)
         self.cr.fill()
 
-    def draw_fortress(self, owner, x, y):
+    def draw_fortress(self, owner : int, x: int, y: int) -> None:
         if owner == 1:
             self.cr.set_source_rgb(0, 0, 1)
         elif owner == 0:
@@ -97,7 +97,7 @@ class GtkCairoFacade(GraphicsFacade):
                           self.CELL_SIZE, self.CELL_SIZE)
         self.cr.fill()
 
-    def draw_line_background(self, col, row, is_selected):
+    def draw_line_background(self, col : int, row :int, is_selected: int) -> None:
         if is_selected:
             self.cr.set_source_rgb(1, 1, 1)
         else:
@@ -106,7 +106,7 @@ class GtkCairoFacade(GraphicsFacade):
                           self.LINE_WIDTH, self.LINE_HEIGHT)
         self.cr.fill()
 
-    def draw_line_text(self, col, row, text, pos):
+    def draw_line_text(self, col: int, row: int, text: str, pos:int) -> None:
         if pos == 0:
             self.cr.set_source_rgb(0, 1, 0)
         elif pos == 1:
@@ -121,32 +121,33 @@ class GtkCairoFacade(GraphicsFacade):
 
         self.cr.show_text(text)
 
-    def draw_end_text(self, text):
+    def draw_end_text(self, text: str) -> None:
+        self.cr.set_font_size(30);
         self.cr.move_to(self.window.width / 2, self.window.height / 2)
         self.cr.show_text(text)
 
-    def draw_panel_background(self):
+    def draw_panel_background(self) -> None:
         self.cr.set_source_rgb(0, 0, 0)
         self.cr.rectangle(self.window.width - self.GOLD_PANEL_WIDTH,
                           self.window.height - self.GOLD_PANEL_HEIGHT,
                           self.GOLD_PANEL_WIDTH, self.GOLD_PANEL_HEIGHT)
         self.cr.fill()
 
-    def draw_gold(self, gold):
+    def draw_gold(self, gold: int) -> None:
         self.cr.move_to(self.window.width - self.GOLD_PANEL_WIDTH + 3,
                         self.window.height - self.GOLD_PANEL_HEIGHT / 2)
         self.cr.set_source_rgb(1, 1, 0)
         self.cr.set_font_size(24)
         self.cr.show_text(str(gold))
 
-    def draw_moves_left(self, moves):
+    def draw_moves_left(self, moves:int) -> None:
         self.cr.move_to(self.window.width - self.GOLD_PANEL_WIDTH + 200,
                         self.window.height - self.GOLD_PANEL_HEIGHT / 2)
         self.cr.set_source_rgb(0, 0, 1)
         self.cr.set_font_size(24)
         self.cr.show_text(str(moves))
     
-    def draw_target(self, row, col):
+    def draw_target(self, row: int, col: int ) -> None:
         self.cr.set_source_rgb(0, 1, 0)
         self.cr.arc(row * self.CELL_SIZE + self.CELL_SIZE // 2, col * self.CELL_SIZE + self.CELL_SIZE // 2,
                     5, 0, 2 * math.pi)

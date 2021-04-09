@@ -1,4 +1,4 @@
-from .json_serializable import *
+from tpgame.json_serializable import IJsonSerializable
 class Soldier(IJsonSerializable):
     DEFAULT_COST = 30
     DEFAULT_ARMOR = 0
@@ -9,20 +9,20 @@ class Soldier(IJsonSerializable):
     MIN_ARMOR = 0
     MAX_ARMOR = 80
 
-    def __init__(self, squad=None, armor=DEFAULT_ARMOR, attack=DEFAULT_ATTACK):
+    def __init__(self, squad=None, armor: int =DEFAULT_ARMOR, attack: int =DEFAULT_ATTACK) -> None:
         self.squad = squad
         self.armor = armor
         self.attack = attack
         self.hp = 100
 
-    def get_info(self):
+    def get_info(self) -> dict:
         info = {'armor': self.armor,
                 'attack': self.attack,
                 'hp': self.hp
                 }
         return info
 
-    def reset_from_info(self, info):
+    def reset_from_info(self, info: str) -> None:
         self.armor = info['armor']
         self.attack = info['attack']
         self.hp = info['hp']
@@ -30,7 +30,7 @@ class Soldier(IJsonSerializable):
     def alive(self) -> bool:
         return self.hp > 0
 
-    def fight(self, enemy):
+    def fight(self, enemy) -> None:
         my_attack = self.attack * (100 - enemy.armor) // 100 + 1
         enemy_attack = enemy.attack * (100 - self.armor) // 100 + 1
         self.hp -= enemy_attack

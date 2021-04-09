@@ -1,14 +1,14 @@
-from .json_serializable import *
-from .soldier import *
+from tpgame.json_serializable import IJsonSerializable
+from tpgame.soldier import Soldier
 
 class Squad(IJsonSerializable):
-    def __init__(self, player, x=-1, y=-1):
+    def __init__(self, player, x: int=-1, y: int=-1) -> None:
         self.player = player
         self.x = x
         self.y = y
         self.soldiers = []
 
-    def get_info(self):
+    def get_info(self) -> dict:
         player = self.player.map.get_player_code(self.player)
         info = {'player': player,
                 'x': self.x,
@@ -20,10 +20,10 @@ class Squad(IJsonSerializable):
 
         return info
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.soldiers)
 
-    def reset_from_info(self, info):
+    def reset_from_info(self, info: str) -> None:
         self.x = info['x']
         self.y = info['y']
         self.soldiers = []
@@ -32,17 +32,17 @@ class Squad(IJsonSerializable):
             self.soldiers.append(Soldier(self))
             self.soldiers[-1].reset_from_info(i)
 
-    def move(self, dx, dy):
+    def move(self, dx: int, dy: int) -> None:
         self.x += dx
         self.y += dy
 
-    def add_soldier(self, soldier: Soldier):
+    def add_soldier(self, soldier: Soldier) -> None:
         self.soldiers.append(soldier)
 
     def empty(self) -> bool:
         return len(self.soldiers) == 0
 
-    def update(self):
+    def update(self) -> None:
         self.soldiers = [soldier for soldier in self.soldiers if soldier.alive()]
 
     def size(self) -> int:
@@ -64,11 +64,11 @@ class Squad(IJsonSerializable):
             # Victory
             return True
 
-    def unite(self, friend_squad):
+    def unite(self, friend_squad) -> None:
         self.soldiers += friend_squad.soldiers
         friend_squad.soldiers = []
 
-    def interact(self, other):
+    def interact(self, other) -> None:
         if self.player == other.player:
             self.unite(other)
         else:

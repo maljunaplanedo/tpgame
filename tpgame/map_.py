@@ -1,8 +1,10 @@
-from .network import INetworkEventSubscriber
-from .json_serializable import *
-from .player import *
-from .squad import *
-from .fortress import *
+from tpgame.network import INetworkEventSubscriber
+from tpgame.json_serializable import IJsonSerializable
+from tpgame.player import Player
+from tpgame.squad import Squad
+from tpgame.soldier import Soldier
+from tpgame.graphic import screens
+from tpgame.fortress import Fortress
 import random
 
 
@@ -12,7 +14,7 @@ class Map(INetworkEventSubscriber, IJsonSerializable):
     FORTRESSES_NUMBER = 12
     ONE_TURN_MOVES = 10
 
-    def __init__(self, game):
+    def __init__(self, game) -> None:
         self.game = game
         self.squads = []
         self.fortresses = []
@@ -25,7 +27,7 @@ class Map(INetworkEventSubscriber, IJsonSerializable):
         self.game.network.subscribe('connect', self)
         self.game.network.subscribe('map_update', self)
 
-    def get_info(self):
+    def get_info(self) -> dict:
         turn = self.get_player_code(self.turn)
 
         selected_squad = self.get_index_of_squad(self.selected_squad)
@@ -46,7 +48,7 @@ class Map(INetworkEventSubscriber, IJsonSerializable):
 
         return info
 
-    def reset_from_info(self, info):
+    def reset_from_info(self, info: str) -> None:
         self.protagonist = Player(self)
         self.antagonist = Player(self)
 
@@ -69,30 +71,30 @@ class Map(INetworkEventSubscriber, IJsonSerializable):
         self.turn = self.get_player_by_code(info['turn'])
         self.selected_squad = self.get_squad_by_index(info['selected_squad'])
 
-    def get_index_of_squad(self, squad):
+    def get_index_of_squad(self, squad: Squad) -> int:
         try:
             return self.squads.index(squad)
         except ValueError:
             return -1
 
-    def get_squad_by_index(self, index):
+    def get_squad_by_index(self, index: int) -> Squad:
         if index == -1:
             return None
         return self.squads[index]
 
-    def get_player_code(self, player):
+    def get_player_code(self, player: Player) -> int:
         if player == self.antagonist:
             return 0
         elif player == self.protagonist:
             return 1
         return -1
 
-    def get_player_by_code(self, code):
+    def get_player_by_code(self, code : int) -> Player:
         if code == -1:
             return None
         return self.protagonist if code == 0 else self.antagonist
 
-    def handle_network_event(self, type_, event):
+    def handle_network_event(self, type_ : str, event: dict) -> None:
         if type_ == 'connect':
             self.on_network_connected(event['host'])
         elif type_ == 'map_update':
@@ -101,15 +103,15 @@ class Map(INetworkEventSubscriber, IJsonSerializable):
                 self.check_turn_end()
         self.game.window.redraw()
 
-    def on_network_connected(self, is_host):
+    def on_network_connected(self, is_host : bool) -> None:
         if is_host:
             self.generate_map()
             self.send_state()
 
-    def get_fort_by_garrison(self, squad):
+    def get_fort_by_garrison(self, squad: Squad) -> list:
         return [i for i in self.fortresses if i.garrison is squad][0]
 
-    def move_selected_squad(self, dx, dy):
+    def move_selected_squad(self, dx: int, dy: int) -> None:
         if self.selected_squad.is_garrison():
             fort = self.get_fort_by_garrison(self.selected_squad)
             self.add_squad(self.protagonist, fort.x, fort.y)
@@ -143,10 +145,10 @@ class Map(INetworkEventSubscriber, IJsonSerializable):
         if not self.check_game_end():
             self.check_turn_end()
 
-    def end_game(self, result):
+    def end_game(self, result: int) -> None:
         screens.EndScreen(self.game.window, result).open_()
 
-    def check_game_end(self):
+    def check_game_end(self) -> bool:
         protagonist_forts =\
             [i for i in self.fortresses if i.master == self.protagonist]
         antagonist_forts =\
@@ -173,16 +175,16 @@ class Map(INetworkEventSubscriber, IJsonSerializable):
             return True
         return False
 
-    def check_turn_end(self):
+    def check_turn_end(self) -> None:
         if not self.moves_left:
             self.start_turn(self.protagonist
                             if self.turn == self.antagonist
                             else self.antagonist)
 
-    def add_squad(self, player, x, y):
+    def add_squad(self, player: Player, x: int, y: int) -> None:
         self.squads.append(Squad(player, x, y))
 
-    def remove_invalid_squads(self):
+    def remove_invalid_squads(self) -> None:
         has_non_empty_squad = False
         for squad in self.squads:
             if squad.player == self.protagonist and not squad.empty():
@@ -194,39 +196,39 @@ class Map(INetworkEventSubscriber, IJsonSerializable):
             self.select_other_squad()
         self.squads = [squad for squad in self.squads if not squad.empty()]
 
-    def select_first_squad(self, player):
+    def select_first_squad(self, player: Player) -> None:
         index = 0
         while self.squads[index].player != player:
             index += 1
         self.selected_squad = self.squads[index]
 
-    def select_other_squad(self, delta=1):
+    def select_other_squad(self, delta: int = 1) -> None:
         index = (self.squads.index(self.selected_squad) + delta) % len(self.squads)
         while self.squads[index].player != self.protagonist:
             index = (index + delta) % len(self.squads)
         self.selected_squad = self.squads[index]
 
-    def send_state(self):
+    def send_state(self) -> None:
         state = self.get_info()
         self.game.network.send_message({'type': 'map_update', 'event': state})
 
-    def squads_at_cell(self, x, y):
+    def squads_at_cell(self, x: int, y: int) -> list:
         return [squad for squad in self.squads
                 if squad.x == x and squad.y == y]
 
-    def forts_at_cell(self, x, y):
+    def forts_at_cell(self, x: int, y: int) -> list:
         return [fort for fort in self.fortresses
                 if fort.x == x and fort.y == y]
 
-    def is_valid_cell(self, x, y):
+    def is_valid_cell(self, x: int, y: int) -> bool:
         return x in range(self.WIDTH) and y in range(self.HEIGHT)
 
-    def is_empty_cell(self, x, y):
+    def is_empty_cell(self, x: int, y: int) -> bool:
         return (self.is_valid_cell(x, y) and
                 not self.squads_at_cell(x, y) and
                 not self.forts_at_cell(x, y))
 
-    def start_turn(self, player):
+    def start_turn(self, player: Player) -> None:
         self.moves_left = self.ONE_TURN_MOVES
         self.turn = player
 
@@ -236,7 +238,7 @@ class Map(INetworkEventSubscriber, IJsonSerializable):
 
         self.select_first_squad(player)
 
-    def generate_map(self):
+    def generate_map(self) -> None:
         self.add_squad(self.protagonist, 0, 0)
         self.squads[-1].add_soldier(Soldier(self.squads[-1]))
 
