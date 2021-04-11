@@ -8,7 +8,7 @@ from gi.repository import Gtk, Gdk, GObject
 
 class GtkCairoFacade(GraphicsFacade):
 
-    CELL_SIZE = 40
+    CELL_SIZE = 50
     LINE_HEIGHT = 40
     LINE_WIDTH = 640 / 3
     GOLD_PANEL_HEIGHT = 40
@@ -80,32 +80,40 @@ class GtkCairoFacade(GraphicsFacade):
 
     def draw_squad(self, owner: int, x: int, y: int) -> None:
         if owner == 1:
-            self.cr.set_source_rgb(0, 0, 1)
+            avatar = "images/1.png"
         else:
-            self.cr.set_source_rgb(1, 0, 0)
-
-        self.cr.arc(
-            x * self.CELL_SIZE + self.CELL_SIZE / 2,
-            y * self.CELL_SIZE + self.CELL_SIZE / 2,
-            self.CELL_SIZE / 2,
-            0,
-            2 * math.pi,
-        )
-        self.cr.fill()
+            avatar = "images/2.png"
+        self.cr.save()
+        self.cr.translate(x * self.CELL_SIZE, y * self.CELL_SIZE)
+        image_surface = cairo.ImageSurface.create_from_png(avatar)
+        img_height = image_surface.get_height()
+        img_width = image_surface.get_width()
+        width_ratio = float(self.CELL_SIZE) / float(img_width)
+        height_ratio = float(self.CELL_SIZE) / float(img_height)
+        self.cr.scale(width_ratio, height_ratio)
+        self.cr.set_source_surface(image_surface)
+        self.cr.paint()
+        self.cr.restore()
 
     def draw_fortress(self, owner: int, x: int, y: int) -> None:
         if owner == 1:
-            self.cr.set_source_rgb(0, 0, 1)
+            castle = "images/castle1.png"
         elif owner == 0:
-            self.cr.set_source_rgb(1, 0, 0)
+            castle = "images/castle2.png"
         else:
-            self.cr.set_source_rgb(0, 0, 0)
+            castle = "images/castle0.png"
 
-        self.cr.rectangle(
-            x * self.CELL_SIZE, y * self.CELL_SIZE,
-            self.CELL_SIZE, self.CELL_SIZE
-        )
-        self.cr.fill()
+        self.cr.save()
+        self.cr.translate(x * self.CELL_SIZE, y * self.CELL_SIZE)
+        image_surface = cairo.ImageSurface.create_from_png(castle)
+        img_height = image_surface.get_height()
+        img_width = image_surface.get_width()
+        width_ratio = float(self.CELL_SIZE) / float(img_width)
+        height_ratio = float(self.CELL_SIZE) / float(img_height)
+        self.cr.scale(width_ratio, height_ratio)
+        self.cr.set_source_surface(image_surface)
+        self.cr.paint()
+        self.cr.restore()
 
     def draw_line_background(self, col: int,
                              row: int, is_selected: int) -> None:
