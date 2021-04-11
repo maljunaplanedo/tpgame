@@ -1,11 +1,14 @@
 from abc import abstractmethod
 from tpgame.graphic.gtk_facade import GtkCairoFacade
 
+
 class Window:
     pass
-# Screen is class for Screen events ( like fortress menu , win screen, lose screen)
-class Screen:
 
+
+# Screen is class for Screen events
+# ( like fortress menu , win screen, lose screen)
+class Screen:
     def __init__(self, window: Window) -> None:
         self.window = window
 
@@ -58,3 +61,4 @@ class Window:
     @property
     def height(self) -> int:
         return self.HEIGHT
+

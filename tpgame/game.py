@@ -21,3 +21,4 @@ class Game:
 
     def stop(self) -> None:
         self.main_loop_running = False
+

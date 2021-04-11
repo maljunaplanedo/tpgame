@@ -1,4 +1,6 @@
 from tpgame.json_serializable import IJsonSerializable
+
+
 class Soldier(IJsonSerializable):
     DEFAULT_COST = 30
     DEFAULT_ARMOR = 0
@@ -9,23 +11,23 @@ class Soldier(IJsonSerializable):
     MIN_ARMOR = 0
     MAX_ARMOR = 80
 
-    def __init__(self, squad=None, armor: int =DEFAULT_ARMOR, attack: int =DEFAULT_ATTACK) -> None:
+    def __init__(
+        self, squad=None, armor: int = DEFAULT_ARMOR,
+        attack: int = DEFAULT_ATTACK
+    ) -> None:
         self.squad = squad
         self.armor = armor
         self.attack = attack
         self.hp = 100
 
     def get_info(self) -> dict:
-        info = {'armor': self.armor,
-                'attack': self.attack,
-                'hp': self.hp
-                }
+        info = {"armor": self.armor, "attack": self.attack, "hp": self.hp}
         return info
 
     def reset_from_info(self, info: str) -> None:
-        self.armor = info['armor']
-        self.attack = info['attack']
-        self.hp = info['hp']
+        self.armor = info["armor"]
+        self.attack = info["attack"]
+        self.hp = info["hp"]
 
     def alive(self) -> bool:
         return self.hp > 0
@@ -40,10 +42,9 @@ class Soldier(IJsonSerializable):
         delta_armor = self.armor - self.MIN_ARMOR
         delta_attack = self.attack - self.MIN_ATTACK
         delta_armor_percent = delta_armor / (self.MAX_ARMOR - self.MIN_ARMOR)
-        delta_attack_percent = delta_attack / (self.MAX_ATTACK - self.MIN_ATTACK)
-        return (
-                self.DEFAULT_COST +
-                int(self.BONUS_COST * (delta_armor_percent + delta_attack_percent))
+        delta_attack_percent = delta_attack / (
+            self.MAX_ATTACK - self.MIN_ATTACK)
+        return self.DEFAULT_COST + int(
+            self.BONUS_COST * (delta_armor_percent + delta_attack_percent)
         )
-
 

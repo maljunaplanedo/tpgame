@@ -17,10 +17,10 @@ class Network:
     def __init__(self) -> None:
         self.subscribers = defaultdict(list)
         self.socket = socket.socket()
-        self.receiving_message = b''
+        self.receiving_message = b""
         self.sending_messages = deque()
 
-        self.target_ip = ''
+        self.target_ip = ""
         self.target_port = 0
         self.is_host = False
 
@@ -34,22 +34,22 @@ class Network:
     @staticmethod
     def encode_message(message: str) -> str:
         message = json.dumps(message).encode()
-        message += b'#' * (Network.MESSAGE_LEN - len(message))
+        message += b"#" * (Network.MESSAGE_LEN - len(message))
 
         return message
 
     @staticmethod
     def decode_message(message: str) -> dict:
-        message = message.rstrip(b'#')
+        message = message.rstrip(b"#")
         return json.loads(message.decode())
 
-    def send_message(self, message: str) ->  None:
+    def send_message(self, message: str) -> None:
         message = self.encode_message(message)
         self.sending_messages.append(message)
 
     def connect(self) -> None:
         if self.is_host:
-            self.socket.bind(('', self.target_port))
+            self.socket.bind(("", self.target_port))
             self.socket.listen(1)
             self.socket.setblocking(False)
 
@@ -61,7 +61,7 @@ class Network:
                     pass
 
             self.socket.setblocking(False)
-            self.cause_event('connect', {'host': True})
+            self.cause_event("connect", {"host": True})
         else:
             self.socket.setblocking(False)
 
@@ -72,7 +72,7 @@ class Network:
                 except BlockingIOError:
                     pass
 
-            self.cause_event('connect', {'host': False})
+            self.cause_event("connect", {"host": False})
 
     def __del__(self) -> None:
         self.socket.close()
@@ -82,14 +82,14 @@ class Network:
 
     def check_file_data(self) -> bool:
         try:
-            with open('netconfig.txt', 'r') as f:
+            with open("netconfig.txt", "r") as f:
                 file = f.read()
                 file.strip()
 
                 self.target_ip, self.target_port = file.split()
                 self.target_port = int(self.target_port)
 
-                if self.target_ip == 'host':
+                if self.target_ip == "host":
                     self.is_host = True
 
             self.connect()
@@ -103,17 +103,18 @@ class Network:
 
     def receive_message(self) -> None:
         msg = self.decode_message(self.receiving_message)
-        type_ = msg['type']
-        event = msg['event']
+        type_ = msg["type"]
+        event = msg["event"]
         self.cause_event(type_, event)
 
     def receive_iteration(self) -> None:
         try:
-            self.receiving_message +=\
-                self.socket.recv(self.MESSAGE_LEN - len(self.receiving_message))
+            self.receiving_message += self.socket.recv(
+                self.MESSAGE_LEN - len(self.receiving_message)
+            )
             if len(self.receiving_message) == self.MESSAGE_LEN:
                 self.receive_message()
-                self.receiving_message = b''
+                self.receiving_message = b""
 
         except BlockingIOError:
             pass
@@ -123,7 +124,8 @@ class Network:
             return
         try:
             bytes_sent = self.socket.send(
-                self.sending_messages[0], len(self.sending_messages[0]))
+                self.sending_messages[0], len(self.sending_messages[0])
+            )
             self.sending_messages[0] = self.sending_messages[0][bytes_sent:]
             if not self.sending_messages[0]:
                 self.sending_messages.popleft()
@@ -134,3 +136,4 @@ class Network:
     def iteration(self):
         self.receive_iteration()
         self.send_iteration()
+

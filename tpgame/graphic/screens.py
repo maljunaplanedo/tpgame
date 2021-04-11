@@ -11,20 +11,23 @@ class FortressScreen(Screen):
         self.selected_soldier = [self.fortress.shop, 0]
 
     def up_down_event(self, key) -> None:
-        if key == 'w':
+        if key == "w":
             new_index = max(0, self.selected_soldier[1] - 1)
         else:
-            new_index = min(len(self.selected_soldier[0]) - 1, self.selected_soldier[1] + 1)
+            new_index = min(
+                len(self.selected_soldier[0]) - 1, self.selected_soldier[1] + 1
+            )
         self.selected_soldier[1] = new_index
 
     def right_left_event(self, key) -> None:
-        items = [self.fortress.garrison, self.fortress.guest, self.fortress.shop]
-        if key == 'a':
-            new_squad_index = (items.index(self.selected_soldier[0])
-                               - 1) % len(items)
+        items = [self.fortress.garrison,
+                 self.fortress.guest, self.fortress.shop]
+        if key == "a":
+            new_squad_index = (items.index(self.selected_soldier[0]) -
+                               1) % len(items)
         else:
-            new_squad_index = (items.index(self.selected_soldier[0])
-                               + 1) % len(items)
+            new_squad_index = (items.index(self.selected_soldier[0]) +
+                               1) % len(items)
         if len(items[new_squad_index]):
             self.selected_soldier[0] = items[new_squad_index]
             self.selected_soldier[1] = 0
@@ -35,7 +38,7 @@ class FortressScreen(Screen):
         else:
             self.fortress.move_soldier(
                 self.selected_soldier[1],
-                self.selected_soldier[0] != self.fortress.guest
+                self.selected_soldier[0] != self.fortress.guest,
             )
         if self.selected_soldier[1] >= len(self.selected_soldier[0]):
             if len(self.selected_soldier[0]) == 0:
@@ -48,13 +51,13 @@ class FortressScreen(Screen):
         self.fortress.throw_guest_away()
 
     def keyboard_event(self, key) -> None:
-        if key in ['w', 's']:
+        if key in ["w", "s"]:
             self.up_down_event(key)
-        elif key in ['a', 'd']:
+        elif key in ["a", "d"]:
             self.right_left_event(key)
-        elif key == 'e':
+        elif key == "e":
             self.equip_event()
-        elif key == 'Escape':
+        elif key == "Escape":
             self.exit_event()
 
     def draw(self) -> None:
@@ -62,32 +65,43 @@ class FortressScreen(Screen):
 
         columns = [[]]
         for i in self.fortress.garrison.soldiers:
-            columns[-1].append({'hp': i.hp, 'attack': i.attack, 'armor': i.armor})
+            columns[-1].append({"hp": i.hp,
+                                "attack": i.attack, "armor": i.armor})
         if self.selected_soldier[0] == self.fortress.garrison:
-            columns[-1][self.selected_soldier[1]]['selected'] = True
+            columns[-1][self.selected_soldier[1]]["selected"] = True
 
         columns.append([])
         for i in self.fortress.guest.soldiers:
-            columns[-1].append({'hp': i.hp, 'attack': i.attack, 'armor': i.armor})
+            columns[-1].append({"hp": i.hp,
+                                "attack": i.attack, "armor": i.armor})
         if self.selected_soldier[0] == self.fortress.guest:
-            columns[-1][self.selected_soldier[1]]['selected'] = True
+            columns[-1][self.selected_soldier[1]]["selected"] = True
 
         columns.append([])
         for i in self.fortress.shop:
-            columns[-1].append({'attack': i[0].attack, 'armor': i[0].armor, 'cost': i[1]})
+            columns[-1].append(
+                {"attack": i[0].attack, "armor": i[0].armor, "cost": i[1]}
+            )
         if self.selected_soldier[0] == self.fortress.shop:
-            columns[-1][self.selected_soldier[1]]['selected'] = True
+            columns[-1][self.selected_soldier[1]]["selected"] = True
 
         for i in range(3):
             for j in range(len(columns[i])):
                 line = columns[i][j]
-                self.window.graphics_facade.draw_line_background(i, j, 'selected' in line.keys())
-                if 'hp' in line.keys():
-                    self.window.graphics_facade.draw_line_text(i, j, str(line['hp']), 0)
-                self.window.graphics_facade.draw_line_text(i, j, str(line['attack']), 1)
-                self.window.graphics_facade.draw_line_text(i, j, str(line['armor']), 2)
-                if 'cost' in line.keys():
-                    self.window.graphics_facade.draw_line_text(i, j, str(line['cost']), 3)
+                self.window.graphics_facade.draw_line_background(
+                    i, j, "selected" in line.keys()
+                )
+                if "hp" in line.keys():
+                    self.window.graphics_facade.draw_line_text(
+                        i, j, str(line["hp"]), 0)
+                self.window.graphics_facade.draw_line_text(
+                    i, j, str(line["attack"]), 1)
+                self.window.graphics_facade.draw_line_text(
+                    i, j, str(line["armor"]), 2)
+                if "cost" in line.keys():
+                    self.window.graphics_facade.draw_line_text(
+                        i, j, str(line["cost"]), 3
+                    )
 
         self.window.graphics_facade.draw_panel_background()
         self.window.graphics_facade.draw_gold(self.fortress.master.gold)
@@ -102,18 +116,18 @@ class MapScreen(Screen):
         self.map = map_
 
     def movement_event(self, key) -> None:
-        if key == 'w':
+        if key == "w":
             movement = (0, -1)
-        elif key == 'a':
+        elif key == "a":
             movement = (-1, 0)
-        elif key == 's':
+        elif key == "s":
             movement = (0, 1)
         else:
             movement = (1, 0)
         self.map.move_selected_squad(*movement)
 
     def change_squad_event(self, key) -> None:
-        if key == 'Right':
+        if key == "Right":
             delta = 1
         else:
             delta = -1
@@ -122,9 +136,9 @@ class MapScreen(Screen):
     def keyboard_event(self, key) -> None:
         if self.map.turn != self.map.protagonist:
             return
-        if key in ['w', 'a', 's', 'd']:
+        if key in ["w", "a", "s", "d"]:
             self.movement_event(key)
-        elif key in ['Left', 'Right']:
+        elif key in ["Left", "Right"]:
             self.change_squad_event(key)
 
     def draw(self) -> None:
@@ -143,24 +157,28 @@ class MapScreen(Screen):
         diff_y = camera_y - self.WINDOW_CELL_HEIGHT // 2 + 1
 
         self.window.graphics_facade.draw_background()
-        self.window.graphics_facade.draw_ground(-diff_x, -diff_y,
-                                                self.map.WIDTH - diff_x - 1,
-                                                self.map.HEIGHT - diff_y - 1)
+        self.window.graphics_facade.draw_ground(
+            -diff_x, -diff_y, self.map.WIDTH -
+            diff_x - 1, self.map.HEIGHT - diff_y - 1
+        )
 
         for i in self.map.fortresses:
             player_code = self.map.get_player_code(i.master)
-            self.window.graphics_facade.draw_fortress(player_code,
-                                                      i.x - diff_x,
-                                                      i.y - diff_y)
+            self.window.graphics_facade.draw_fortress(
+                player_code, i.x - diff_x, i.y - diff_y
+            )
 
         for i in self.map.squads:
             player_code = self.map.get_player_code(i.player)
             if not i.is_garrison():
-                self.window.graphics_facade.draw_squad(player_code,
-                                                       i.x - diff_x,
-                                                       i.y - diff_y)
+                self.window.graphics_facade.draw_squad(
+                    player_code, i.x - diff_x, i.y - diff_y
+                )
 
-        self.window.graphics_facade.draw_target(round(self.WINDOW_CELL_WIDTH / 2) - 1, round(self.WINDOW_CELL_HEIGHT / 2) - 1)
+        self.window.graphics_facade.draw_target(
+            round(self.WINDOW_CELL_WIDTH / 2) - 1,
+            round(self.WINDOW_CELL_HEIGHT / 2) - 1,
+        )
 
         self.window.graphics_facade.draw_panel_background()
         self.window.graphics_facade.draw_gold(self.map.protagonist.gold)
@@ -183,3 +201,4 @@ class EndScreen(Screen):
         else:
             text = "Draw"
         self.window.graphics_facade.draw_end_text(text)
+

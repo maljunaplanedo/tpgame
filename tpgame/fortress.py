@@ -5,11 +5,12 @@ from tpgame.json_serializable import IJsonSerializable
 from tpgame.player import Player
 from tpgame.soldier import Soldier
 
+
 class Fortress(IJsonSerializable):
     SHOP_SIZE = 6
     FORTRESS_PROFIT = 100
 
-    def __init__(self, game, x : int, y : int) -> None:
+    def __init__(self, game, x: int, y: int) -> None:
         self.game = game
         self.guest = None
         self.garrison = None
@@ -22,25 +23,27 @@ class Fortress(IJsonSerializable):
     def get_info(self) -> dict:
         master = self.game.map.get_player_code(self.master)
 
-        info = {'guest': self.game.map.get_index_of_squad(self.guest),
-                'garrison': self.game.map.get_index_of_squad(self.garrison),
-                'shop': [],
-                'master': master,
-                'x': self.x,
-                'y': self.y}
+        info = {
+            "guest": self.game.map.get_index_of_squad(self.guest),
+            "garrison": self.game.map.get_index_of_squad(self.garrison),
+            "shop": [],
+            "master": master,
+            "x": self.x,
+            "y": self.y,
+        }
 
         for i in self.shop:
-            info['shop'].append([i[0].get_info(), i[1]])
+            info["shop"].append([i[0].get_info(), i[1]])
 
         return info
 
-    def reset_from_info(self, info : str) -> None:
-        self.guest = self.game.map.get_squad_by_index(info['guest'])
-        self.garrison = self.game.map.get_squad_by_index(info['garrison'])
-        self.master = self.game.map.get_player_by_code(info['master'])
+    def reset_from_info(self, info: str) -> None:
+        self.guest = self.game.map.get_squad_by_index(info["guest"])
+        self.garrison = self.game.map.get_squad_by_index(info["garrison"])
+        self.master = self.game.map.get_player_by_code(info["master"])
         self.shop = []
 
-        for i in info['shop']:
+        for i in info["shop"]:
             self.shop.append((Soldier(), i[1]))
             self.shop[-1][0].reset_from_info(i[0])
 
@@ -52,10 +55,11 @@ class Fortress(IJsonSerializable):
 
     def generate_shop(self) -> None:
         for i in range(self.SHOP_SIZE):
-            soldier = Soldier(None,
-                              random.randint(Soldier.MIN_ARMOR, Soldier.MAX_ARMOR),
-                              random.randint(Soldier.MIN_ATTACK, Soldier.MAX_ATTACK)
-                              )
+            soldier = Soldier(
+                None,
+                random.randint(Soldier.MIN_ARMOR, Soldier.MAX_ARMOR),
+                random.randint(Soldier.MIN_ATTACK, Soldier.MAX_ATTACK),
+            )
             self.shop.append((soldier, soldier.cost()))
 
     def recruit_soldier(self, index: int) -> bool:
@@ -66,8 +70,11 @@ class Fortress(IJsonSerializable):
         self.guest.add_soldier(copy.copy(soldier_cost[0]))
         return True
 
-    def move_soldier(self, index : int, to_guest : bool) -> None:
-        from_, to_ = (self.garrison, self.guest) if to_guest else (self.guest, self.garrison)
+    def move_soldier(self, index: int, to_guest: bool) -> None:
+        from_, to_ = (
+            (self.garrison, self.guest)
+            if to_guest else (self.guest, self.garrison)
+        )
         to_.add_soldier(from_.soldiers[index])
         from_.soldiers.pop(index)
 
@@ -79,8 +86,8 @@ class Fortress(IJsonSerializable):
             self.garrison = None
 
     def accept_visitor(self, squad) -> None:
-        if (self.master == self.game.map.antagonist
-                and self.garrison is not None):
+        if self.master == self.game.map.antagonist and \
+        self.garrison is not None:
 
             squad.fight(self.garrison)
             self.check_garrison_existence()
@@ -114,5 +121,4 @@ class Fortress(IJsonSerializable):
         if not self.game.map.check_game_end():
             self.game.map.check_turn_end()
         self.game.window.redraw()
-
 

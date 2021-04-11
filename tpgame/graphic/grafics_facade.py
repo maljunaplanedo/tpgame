@@ -1,4 +1,6 @@
 from abc import abstractmethod
+
+
 # Facade pattern
 class GraphicsFacade:
     def __init__(self, window) -> None:
@@ -21,19 +23,20 @@ class GraphicsFacade:
         pass
 
     @abstractmethod
-    def draw_fortress(self, owner: int, x: int, y:int) -> None:
+    def draw_fortress(self, owner: int, x: int, y: int) -> None:
         pass
 
     @abstractmethod
-    def draw_background(self, black: bool =False) -> None:
+    def draw_background(self, black: bool = False) -> None:
         pass
 
     @abstractmethod
-    def draw_line_background(self, col: int, row: int, is_selected: bool) -> int:
+    def draw_line_background(self, col: int,
+                             row: int, is_selected: bool) -> int:
         pass
 
     @abstractmethod
-    def draw_line_text(self, col: int, row: int, text: str, pos:int) -> None:
+    def draw_line_text(self, col: int, row: int, text: str, pos: int) -> None:
         pass
 
     @abstractmethod
@@ -49,13 +52,10 @@ class GraphicsFacade:
         pass
 
     @abstractmethod
-    def draw_moves_left(self, moves:int ) -> None:
+    def draw_moves_left(self, moves: int) -> None:
         pass
 
     @abstractmethod
     def draw_target(self, row: int, col: int) -> None:
         pass
-
-
-
 
