@@ -130,16 +130,21 @@ class Fortress(IJsonSerializable):
     def distance(self, squad) -> int:
         return abs(self.x - squad.x) + abs(self.y - squad.y)
 
-    def use_bomb(self) -> None:
+    def use_bomb(self) -> bool:
+        if self.bomb.cost > self.master.gold:
+            return False
+        self.master.gold -= self.bomb.cost
+        
         squads = self.master.map.squads
 
         for squad in squads:
             if squad.player == self.master:
                 continue
             if self.distance(squad) <= self.BOMB_DISTANCE:
-                for soldier in squad:
+                for soldier in squad.soldiers:
                     self.bomb.fight(soldier)
             squad.update()
+        return True
 
 
 

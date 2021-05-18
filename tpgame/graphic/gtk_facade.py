@@ -169,7 +169,7 @@ class GtkCairoFacade(GraphicsFacade):
         self.cr.show_text(text)
 
     def draw_panel_background(self) -> None:
-        self.cr.set_source_rgb(250, 250, 250)
+        self.cr.set_source_rgb(0, 0, 0)
         self.cr.rectangle(
             self.window.width - self.GOLD_PANEL_WIDTH,
             self.window.height - self.GOLD_PANEL_HEIGHT,
