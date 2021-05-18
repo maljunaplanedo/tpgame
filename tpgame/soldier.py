@@ -5,6 +5,7 @@ class Soldier(IJsonSerializable):
     DEFAULT_COST = 30
     DEFAULT_ARMOR = 0
     DEFAULT_ATTACK = 30
+    DEFAULT_HP = 100
     BONUS_COST = 100
     MIN_ATTACK = 30
     MAX_ATTACK = 230
@@ -13,12 +14,12 @@ class Soldier(IJsonSerializable):
 
     def __init__(
         self, squad=None, armor: int = DEFAULT_ARMOR,
-        attack: int = DEFAULT_ATTACK
+        attack: int = DEFAULT_ATTACK, hp: int = DEFAULT_HP
     ) -> None:
         self.squad = squad
         self.armor = armor
         self.attack = attack
-        self.hp = 100
+        self.hp = hp
 
     def get_info(self) -> dict:
         info = {"armor": self.armor, "attack": self.attack, "hp": self.hp}

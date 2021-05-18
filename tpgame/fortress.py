@@ -4,11 +4,13 @@ from tpgame.graphic import screens
 from tpgame.json_serializable import IJsonSerializable
 from tpgame.player import Player
 from tpgame.soldier import Soldier
+from tpgame.bomb import Bomb
 
 
 class Fortress(IJsonSerializable):
     SHOP_SIZE = 6
     FORTRESS_PROFIT = 100
+    BOMB_DISTANCE = 4
 
     def __init__(self, game, x: int, y: int) -> None:
         self.game = game
@@ -18,6 +20,7 @@ class Fortress(IJsonSerializable):
         self.master = None
         self.x = x
         self.y = y
+        self.bomb = Bomb()
         self.generate_shop()
 
     def get_info(self) -> dict:
@@ -61,6 +64,7 @@ class Fortress(IJsonSerializable):
                 random.randint(Soldier.MIN_ATTACK, Soldier.MAX_ATTACK),
             )
             self.shop.append((soldier, soldier.cost()))
+        self.shop.append(self.bomb)
 
     def recruit_soldier(self, index: int) -> bool:
         soldier_cost = self.shop[index]
@@ -121,4 +125,19 @@ class Fortress(IJsonSerializable):
         if not self.game.map.check_game_end():
             self.game.map.check_turn_end()
         self.game.window.redraw()
+
+    def distance(self, squad) -> int:
+        return abs(self.x - squad.x) + abs(self.y - squad.y)
+
+    def use_bomb(self, squads) -> None:
+        for squad in squads:
+            if squad.player == self.master:
+                continue
+            if self.distance(squad) <= self.BOMB_DISTANCE:
+                for soldier in squad:
+                    self.bomb.fight(soldier)
+            squad.update()
+
+
+
 
