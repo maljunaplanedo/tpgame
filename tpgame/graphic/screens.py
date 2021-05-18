@@ -34,7 +34,10 @@ class FortressScreen(Screen):
 
     def equip_event(self) -> None:
         if self.selected_soldier[0] == self.fortress.shop:
-            self.fortress.recruit_soldier(self.selected_soldier[1])
+            if self.selected_soldier[1] == len(self.fortress.shop) - 1:
+                self.fortress.use_bomb()
+            else:
+                self.fortress.recruit_soldier(self.selected_soldier[1])
         else:
             self.fortress.move_soldier(
                 self.selected_soldier[1],

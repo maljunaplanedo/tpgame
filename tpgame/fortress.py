@@ -5,6 +5,7 @@ from tpgame.json_serializable import IJsonSerializable
 from tpgame.player import Player
 from tpgame.soldier import Soldier
 from tpgame.bomb import Bomb
+# from tpgame.map_ import Map
 
 
 class Fortress(IJsonSerializable):
@@ -129,7 +130,9 @@ class Fortress(IJsonSerializable):
     def distance(self, squad) -> int:
         return abs(self.x - squad.x) + abs(self.y - squad.y)
 
-    def use_bomb(self, squads) -> None:
+    def use_bomb(self) -> None:
+        squads = self.master.map.squads
+
         for squad in squads:
             if squad.player == self.master:
                 continue
