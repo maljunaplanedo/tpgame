@@ -104,6 +104,8 @@ class FortressScreen(Screen):
                     )
 
         self.window.graphics_facade.draw_panel_background()
+        self.window.graphics_facade.draw_bomb()
+        #self.window.graphics_facade.draw_line_text(2, 7, str(self.fortress.bomb_price), 1)
         self.window.graphics_facade.draw_gold(self.fortress.master.gold)
 
 

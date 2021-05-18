@@ -94,6 +94,23 @@ class GtkCairoFacade(GraphicsFacade):
         self.cr.set_source_surface(image_surface)
         self.cr.paint()
         self.cr.restore()
+        
+    def draw_bomb(self) -> None:
+        avatar = "images/bomb.png"
+        self.cr.save()
+        self.cr.translate(self.window.width*0.82, self.window.height*0.48)
+        image_surface = cairo.ImageSurface.create_from_png(avatar)
+        img_height = image_surface.get_height()
+        img_width = image_surface.get_width()
+        width_ratio = float(self.CELL_SIZE) / float(img_width)
+        height_ratio = float(self.CELL_SIZE) / float(img_height)
+        self.cr.scale(width_ratio*0.98, height_ratio*0.98)
+        self.cr.set_source_surface(image_surface)
+        self.cr.paint()
+        self.cr.restore()
+        
+        
+        
 
     def draw_fortress(self, owner: int, x: int, y: int) -> None:
         if owner == 1:
@@ -152,7 +169,7 @@ class GtkCairoFacade(GraphicsFacade):
         self.cr.show_text(text)
 
     def draw_panel_background(self) -> None:
-        self.cr.set_source_rgb(0, 0, 0)
+        self.cr.set_source_rgb(250, 250, 250)
         self.cr.rectangle(
             self.window.width - self.GOLD_PANEL_WIDTH,
             self.window.height - self.GOLD_PANEL_HEIGHT,

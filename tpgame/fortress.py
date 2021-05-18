@@ -64,7 +64,7 @@ class Fortress(IJsonSerializable):
                 random.randint(Soldier.MIN_ATTACK, Soldier.MAX_ATTACK),
             )
             self.shop.append((soldier, soldier.cost()))
-        self.shop.append(self.bomb)
+        self.shop.append((self.bomb, self.bomb.cost))
 
     def recruit_soldier(self, index: int) -> bool:
         soldier_cost = self.shop[index]
